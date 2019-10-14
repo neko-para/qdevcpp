@@ -195,6 +195,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		dlg.exec();
 	});
 	connect(ui->actionAboutQt, &QAction::triggered, &QApplication::aboutQt);
+	connect(ui->compileResult, &QTableWidget::doubleClicked, [&](const QModelIndex& idx) {
+		QString row, col;
+		row = ui->compileResult->item(idx.row(), 0)->text();
+		col = ui->compileResult->item(idx.row(), 1)->text();
+		int nrow = 0, ncol = 0;
+		if (row.length()) {
+			nrow = row.toInt() - 1;
+			if (col.length()) {
+				ncol = col.toInt() - 1;
+			}
+			// WARNING! when tab changes, it may behave randomly, even crash.
+			// TODO: cache error log for each file.
+			currentEditor()->setCursorPosition(nrow, ncol);
+			currentEditor()->setFocus();
+		}
+	});
 }
 
 MainWindow::~MainWindow() {
