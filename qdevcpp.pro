@@ -29,17 +29,20 @@ SOURCES += \
         mainwindow.cpp \
     compileconfig.cpp \
     subprocess.cpp \
-    editorinfo.cpp
+    editorinfo.cpp \
+    aboutqdevcpp.cpp
 
 HEADERS += \
         mainwindow.h \
     compileconfig.h \
     global.h \
     subprocess.h \
-    editorinfo.h
+    editorinfo.h \
+    aboutqdevcpp.h
 
 FORMS += \
         mainwindow.ui \
-    compileconfig.ui
+    compileconfig.ui \
+    aboutqdevcpp.ui
 
 RESOURCES +=

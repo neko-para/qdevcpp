@@ -8,6 +8,7 @@
 #include "global.h"
 #include "compileconfig.h"
 #include "subprocess.h"
+#include "aboutqdevcpp.h"
 
 static QList<CompileConfigure> config;
 static int currentConfigIdx;
@@ -94,10 +95,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	loadConfig();
 	connect(ui->actionUndo, &QAction::triggered, [&]() {
-		currentEditor()->SendScintilla(QsciScintilla::SCI_UNDO);
+		currentEditor()->undo();
 	});
 	connect(ui->actionRedo, &QAction::triggered, [&]() {
-		currentEditor()->SendScintilla(QsciScintilla::SCI_REDO);
+		currentEditor()->redo();
 	});
 	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
 	connect(ui->actionNew, &QAction::triggered, [&]() {
@@ -188,6 +189,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			}
 			updateCompileActions();
 		}
+	});
+	connect(ui->actionAboutQDevCpp, &QAction::triggered, [&]() {
+		AboutQDevCpp dlg(this);
+		dlg.exec();
 	});
 	connect(ui->actionAboutQt, &QAction::triggered, &QApplication::aboutQt);
 }
