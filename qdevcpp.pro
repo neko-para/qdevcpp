@@ -27,12 +27,16 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         mainwindow.cpp \
-    compileconfig.cpp
+    compileconfig.cpp \
+    subprocess.cpp \
+    editorinfo.cpp
 
 HEADERS += \
         mainwindow.h \
     compileconfig.h \
-    global.h
+    global.h \
+    subprocess.h \
+    editorinfo.h
 
 FORMS += \
         mainwindow.ui \

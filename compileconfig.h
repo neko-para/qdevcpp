@@ -57,6 +57,8 @@ struct CompileConfigure {
 	void start(QProcess& proc, const QString& src);
 };
 
+extern CompileConfigure* currentConfig;
+
 class CompileConfig : public QDialog {
 	Q_OBJECT
 
