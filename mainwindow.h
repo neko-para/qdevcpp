@@ -10,6 +10,7 @@
 #include <QPlainTextEdit>
 #include <QTableWidget>
 #include <Qsci/qsciscintilla.h>
+#include <Qsci/qscilexer.h>
 #include <QDebug>
 #include <QProcess>
 
@@ -60,6 +61,10 @@ public:
 	virtual ~EditorInfo() {
 		if (path[0] == '#') {
 			untitled_rest.push_back(path.mid(1).toInt());
+		}
+		if (editor->lexer()) {
+			editor->lexer()->deleteLater();
+			editor->setLexer(0);
 		}
 		editor->deleteLater();
 	}
@@ -176,7 +181,7 @@ public:
 		return isUntitled() ? true : QStringList({"c", "cpp", "cxx", "cc", "h", "hpp"}).contains(QFileInfo(path).suffix());
 	}
 	bool compile() const;
-	void run() const;
+	void run();
 };
 
 class MainWindow : public QMainWindow {

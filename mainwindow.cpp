@@ -121,7 +121,10 @@ bool EditorInfo::compile() const {
 	return !retCode;
 }
 
-void EditorInfo::run() const {
+void EditorInfo::run() {
+	if (isUntitled() && !askSave()) {
+		return;
+	}
 	QFileInfo si(path);
 	QString exe = si.path() + QDir::separator() + si.baseName() + exeSuf;
 	if (!QFileInfo(exe).exists()) {
@@ -161,8 +164,8 @@ QsciScintilla* createEditor(QWidget* parent) {
 	QsciScintilla* editor = new QsciScintilla(parent);
 	editor->setLexer(createLexer());
 	editor->setTabWidth(4);
-	editor->setMarginWidth(1, "00");
-	editor->setMarginLineNumbers(1, true);
+	editor->setMarginWidth(0, "000000");
+	editor->setMarginLineNumbers(0, true);
 	return editor;
 }
 
@@ -243,8 +246,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			} else {
 				ei->deleteLater();
 				info.remove(e);
-				e->lexer()->deleteLater();
-				e->setLexer(0);
 			}
 		}
 	});
@@ -284,6 +285,18 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			return;
 		}
 		ui->compileInfo->setCurrentIndex(ei->compile());
+	});
+	connect(ui->actionRun, &QAction::triggered, [&]() {
+		info[currentEditor()]->run();
+	});
+	connect(ui->actionCompileRun, &QAction::triggered, [&]() {
+		auto ei = info[currentEditor()];
+		if (!ei->save()) {
+			return;
+		}
+		if (ei->compile()) {
+			ei->run();
+		}
 
 	});
 	connect(ui->actionCompileConfig, &QAction::triggered, [&]() {
@@ -299,15 +312,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			updateCompileActions();
 		}
 	});
-	connect(ui->actionRun, &QAction::triggered, [&]() {
-		auto ei = info[currentEditor()];
-		if (ei->isUntitled()) {
-			if (!ei->askSave()) {
-				return;
-			}
-		}
-		ei->run();
-	});
+	connect(ui->actionAboutQt, &QAction::triggered, &QApplication::aboutQt);
 }
 
 MainWindow::~MainWindow() {
@@ -328,8 +333,6 @@ bool MainWindow::closeTab(QsciScintilla* e) {
 	updateTab(ui->SrcTab->currentIndex());
 	ei->deleteLater();
 	info.remove(e);
-	e->lexer()->deleteLater();
-	e->setLexer(0);
 	return true;
 }
 
