@@ -17,13 +17,20 @@ void EditorInfo::modificationChanged(bool m) {
 }
 
 void EditorInfo::updateUndoRedoState() {
-	ui->actionUndo->setEnabled(editor->SendScintilla(QsciScintilla::SCI_CANUNDO));
-	ui->actionRedo->setEnabled(editor->SendScintilla(QsciScintilla::SCI_CANREDO));
+	ui->actionUndo->setEnabled(editor->isUndoAvailable());
+	ui->actionRedo->setEnabled(editor->isRedoAvailable());
+}
+
+void EditorInfo::updateCopyCutState() {
+	bool e = editor->selectedText().length();
+	ui->actionCopy->setEnabled(e);
+	ui->actionCut->setEnabled(e);
 }
 
 EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow *ui) : editor(e), ui(ui) {
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
+	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateCopyCutState);
 }
 
 EditorInfo::~EditorInfo()  {

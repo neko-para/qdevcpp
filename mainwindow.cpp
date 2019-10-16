@@ -4,7 +4,7 @@
 #include <Qsci/qscilexercpp.h>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include <QEventLoop>
+#include <QClipboard>
 #include "global.h"
 #include "compileconfig.h"
 #include "subprocess.h"
@@ -12,6 +12,8 @@
 
 static QList<CompileConfigure> config;
 static int currentConfigIdx;
+static QClipboard* clipboard;
+
 CompileConfigure* currentConfig;
 
 void MainWindow::updateTab(int idx) {
@@ -22,14 +24,18 @@ void MainWindow::updateTab(int idx) {
 		ui->actionCloseAll->setEnabled(false);
 		ui->actionUndo->setEnabled(false);
 		ui->actionRedo->setEnabled(false);
+		ui->actionCopy->setEnabled(false);
+		ui->actionCut->setEnabled(false);
 	} else {
 		ui->actionSave->setEnabled(true);
 		ui->actionSaveAs->setEnabled(true);
 		ui->actionClose->setEnabled(true);
 		ui->actionCloseAll->setEnabled(true);
 		info[currentEditor()]->updateUndoRedoState();
+		info[currentEditor()]->updateCopyCutState();
 	}
 	updateCompileActions();
+	updatePasteAction();
 }
 
 QsciLexerCPP* createLexer() {
@@ -94,11 +100,22 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	loadConfig();
+	clipboard = QApplication::clipboard();
+	connect(clipboard, &QClipboard::changed, this, &MainWindow::updatePasteAction);
 	connect(ui->actionUndo, &QAction::triggered, [&]() {
 		currentEditor()->undo();
 	});
 	connect(ui->actionRedo, &QAction::triggered, [&]() {
 		currentEditor()->redo();
+	});
+	connect(ui->actionCopy, &QAction::triggered, [&]() {
+		currentEditor()->copy();
+	});
+	connect(ui->actionCut, &QAction::triggered, [&]() {
+		currentEditor()->cut();
+	});
+	connect(ui->actionPaste, &QAction::triggered, [&]() {
+		currentEditor()->paste();
 	});
 	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
 	connect(ui->actionNew, &QAction::triggered, [&]() {
@@ -241,4 +258,8 @@ void MainWindow::updateCompileActions() {
 	enabled = enabled && (currentConfigIdx != -1);
 	ui->actionCompile->setEnabled(enabled);
 	ui->actionCompileRun->setEnabled(enabled);
+}
+
+void MainWindow::updatePasteAction() {
+	ui->actionPaste->setEnabled(currentEditor() && clipboard->text().length());
 }

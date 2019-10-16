@@ -25,6 +25,7 @@ private slots:
 	void modificationChanged(bool m);
 public slots:
 	void updateUndoRedoState();
+	void updateCopyCutState();
 public:
 	EditorInfo(QsciScintilla* e, Ui::MainWindow* ui);
 	virtual ~EditorInfo();

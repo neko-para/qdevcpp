@@ -28,10 +28,10 @@ public:
 
 	bool closeTab(QsciScintilla* e);
 
-	void updateCompileActions();
-
 private slots:
 	void updateTab(int idx);
+	void updateCompileActions();
+	void updatePasteAction();
 
 private:
 	Ui::MainWindow *ui;

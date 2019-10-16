@@ -72,6 +72,9 @@
     </property>
     <addaction name="actionUndo"/>
     <addaction name="actionRedo"/>
+    <addaction name="actionCopy"/>
+    <addaction name="actionCut"/>
+    <addaction name="actionPaste"/>
    </widget>
    <widget class="QMenu" name="menuSearch">
     <property name="title">
@@ -104,7 +107,7 @@
     <addaction name="actionAboutQDevCpp"/>
     <addaction name="actionAboutDevCpp"/>
     <addaction name="actionAboutQt"/>
-    <addaction name="action_Mingw"/>
+    <addaction name="actionAboutGCC"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
@@ -413,6 +416,9 @@
    <property name="text">
     <string>调试</string>
    </property>
+   <property name="shortcut">
+    <string>F5</string>
+   </property>
   </action>
   <action name="actionStop">
    <property name="text">
@@ -457,9 +463,51 @@
     <string>编译选项</string>
    </property>
   </action>
-  <action name="action_Mingw">
+  <action name="actionAboutGCC">
    <property name="text">
     <string>关于GCC</string>
+   </property>
+  </action>
+  <action name="actionCopy">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>复制</string>
+   </property>
+   <property name="toolTip">
+    <string>复制</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+C</string>
+   </property>
+  </action>
+  <action name="actionCut">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>剪切</string>
+   </property>
+   <property name="toolTip">
+    <string>剪切</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+X</string>
+   </property>
+  </action>
+  <action name="actionPaste">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
+   <property name="text">
+    <string>粘贴</string>
+   </property>
+   <property name="toolTip">
+    <string>粘贴</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+V</string>
    </property>
   </action>
  </widget>
