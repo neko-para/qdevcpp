@@ -5,12 +5,13 @@
 #include <QMap>
 #include <QProcess>
 #include <QJsonObject>
+#include "config.h"
 
 namespace Ui {
 	class CompileConfig;
 }
 
-struct CompileConfigure {
+struct CompileConfigure : public Config {
 	enum Optimize {
 		O_NONE,
 		O_LOW,
@@ -52,8 +53,8 @@ struct CompileConfigure {
 	bool werror = false;
 	bool debug = false;
 
-	QJsonObject toJson() const;
-	void fromJson(QJsonObject obj);
+	virtual QJsonValue toJson() const;
+	virtual void fromJson(QJsonValue value);
 	void start(QProcess& proc, const QString& src);
 };
 

@@ -11,6 +11,8 @@ namespace Ui {
 class EditorInfo : public QObject {
 	Q_OBJECT
 
+	friend class FindReplace;
+
 	QsciScintilla* editor;
 	Ui::MainWindow* ui;
 	QString path;

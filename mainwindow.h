@@ -12,6 +12,7 @@
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 #include "editorinfo.h"
+#include "findreplace.h"
 
 namespace Ui {
 	class MainWindow;
@@ -36,6 +37,7 @@ private slots:
 private:
 	Ui::MainWindow *ui;
 	QMap<QsciScintilla*, EditorInfo*> info;
+	FindReplace* finddlg = nullptr;
 };
 
 #endif // MAINWINDOW_H
