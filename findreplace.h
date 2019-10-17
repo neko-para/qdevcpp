@@ -31,11 +31,11 @@ public:
 	~FindReplace();
 
 	void setEditorInfo(EditorInfo* i);
+	void findFail();
 
 private:
 	Ui::FindReplace *ui;
 	EditorInfo* ei = nullptr;
-	bool findBefore = false;
 	FindReplaceConfig& config;
 };
 

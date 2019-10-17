@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>358</width>
-    <height>439</height>
+    <width>275</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,20 +83,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="onlyInSelected">
-        <property name="text">
-         <string>仅搜索选择区域</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QCheckBox" name="startAtBegin">
-        <property name="text">
-         <string>从开头搜索</string>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="wrap">
         <property name="text">
          <string>循环搜索</string>
@@ -107,32 +93,46 @@
     </widget>
    </item>
    <item>
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="1" column="0">
       <widget class="QPushButton" name="find">
        <property name="text">
         <string>查找</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="replace">
+     <item row="2" column="4">
+      <widget class="QPushButton" name="close">
        <property name="text">
-        <string>替换</string>
+        <string>关闭</string>
        </property>
       </widget>
      </item>
-     <item>
+     <item row="2" column="2">
+      <widget class="QPushButton" name="replaceNext">
+       <property name="text">
+        <string>替换下一个</string>
+       </property>
+      </widget>
+     </item>
+     <item row="1" column="4">
       <widget class="QPushButton" name="replaceAll">
        <property name="text">
         <string>替换全部</string>
        </property>
       </widget>
      </item>
-     <item>
-      <widget class="QPushButton" name="close">
+     <item row="1" column="2">
+      <widget class="QPushButton" name="findNext">
        <property name="text">
-        <string>关闭</string>
+        <string>查找下一个</string>
+       </property>
+      </widget>
+     </item>
+     <item row="2" column="0">
+      <widget class="QPushButton" name="replace">
+       <property name="text">
+        <string>替换</string>
        </property>
       </widget>
      </item>
