@@ -3,26 +3,30 @@
 
 #include <QDialog>
 #include "editorinfo.h"
+#include "config.h"
 
 namespace Ui {
 	class FindReplace;
 }
 
-struct FindReplaceConfig {
+struct FindReplaceConfig : public Config {
 	bool useRegex = false;
 	bool caseInsensitive = false;
 	bool matchWord = false;
 	bool informBeforeReplace = false;
-	bool findAll = false;
+	bool findBackward = false;
 	bool startAtBegin = false;
 	bool onlyInSelected = false;
+
+	virtual QJsonValue toJson() const;
+	virtual void fromJson(QJsonValue value);
 };
 
 class FindReplace : public QDialog {
 	Q_OBJECT
 
 public:
-	explicit FindReplace(QWidget *parent = 0);
+	explicit FindReplace(FindReplaceConfig& cfg, QWidget *parent = 0);
 	~FindReplace();
 
 	void setEditorInfo(EditorInfo* i);
@@ -31,6 +35,7 @@ private:
 	Ui::FindReplace *ui;
 	EditorInfo* ei = nullptr;
 	bool findBefore = false;
+	FindReplaceConfig& config;
 };
 
 #endif // FINDREPLACE_H

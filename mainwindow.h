@@ -12,6 +12,7 @@
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 #include "editorinfo.h"
+#include "findreplace.h"
 
 namespace Ui {
 	class MainWindow;
@@ -28,8 +29,6 @@ public:
 
 	bool closeTab(QsciScintilla* e);
 
-	EditorInfo* infoOf(QsciScintilla* editor);
-
 private slots:
 	void updateTab(int idx);
 	void updateCompileActions();
@@ -38,6 +37,7 @@ private slots:
 private:
 	Ui::MainWindow *ui;
 	QMap<QsciScintilla*, EditorInfo*> info;
+	FindReplace* finddlg = nullptr;
 };
 
 #endif // MAINWINDOW_H

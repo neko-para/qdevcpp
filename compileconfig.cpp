@@ -1,6 +1,7 @@
 #include "compileconfig.h"
 #include "ui_compileconfig.h"
 #include "global.h"
+#include "confighelp.h"
 #include <QFileDialog>
 #include <QProcess>
 #include <QMessageBox>
@@ -8,32 +9,27 @@
 #include <QJsonArray>
 #include <QInputDialog>
 
-QJsonObject CompileConfigure::toJson() const {
+QJsonValue CompileConfigure::toJson() const {
 	QJsonObject obj;
-#define JSON_INSERT(key) \
-	obj.insert(#key, QJsonValue(key))
-	JSON_INSERT(name);
-	JSON_INSERT(gccPath);
-	JSON_INSERT(extraCompile);
-	JSON_INSERT(extraLink);
-	JSON_INSERT(optimize);
-	JSON_INSERT(cstd);
-	JSON_INSERT(cxxstd);
-	JSON_INSERT(bit);
-	JSON_INSERT(warning);
-	JSON_INSERT(werror);
-	JSON_INSERT(debug);
-#undef JSON_INSERT
+#define JSON_OBJ obj
+	JSON_SET(name);
+	JSON_SET(gccPath);
+	JSON_SET(extraCompile);
+	JSON_SET(extraLink);
+	JSON_SET(optimize);
+	JSON_SET(cstd);
+	JSON_SET(cxxstd);
+	JSON_SET(bit);
+	JSON_SET(warning);
+	JSON_SET(werror);
+	JSON_SET(debug);
+#undef JSON_OBJ
 	return obj;
 }
 
-void CompileConfigure::fromJson(QJsonObject obj) {
-#define JSON_GET(key) \
-	do { \
-		if (obj.contains(#key)) { \
-			key = obj[#key].toVariant().value<decltype(key)>(); \
-		} \
-	} while (false)
+void CompileConfigure::fromJson(QJsonValue value) {
+	QJsonObject obj = value.toObject();
+#define JSON_OBJ obj
 	JSON_GET(name);
 	JSON_GET(gccPath);
 	JSON_GET(extraCompile);
@@ -45,7 +41,7 @@ void CompileConfigure::fromJson(QJsonObject obj) {
 	JSON_GET(warning);
 	JSON_GET(werror);
 	JSON_GET(debug);
-#undef JSON_GET
+#undef JSON_OBJ
 }
 
 void CompileConfigure::start(QProcess& proc, const QString& src) {

@@ -17,7 +17,7 @@
    <item>
     <layout class="QFormLayout" name="formLayout">
      <item row="0" column="0">
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="labelFind">
        <property name="text">
         <string>查找</string>
        </property>
@@ -27,7 +27,7 @@
       <widget class="QLineEdit" name="findPattern"/>
      </item>
      <item row="1" column="0">
-      <widget class="QLabel" name="label_2">
+      <widget class="QLabel" name="labelReplace">
        <property name="text">
         <string>替换</string>
        </property>
@@ -39,7 +39,7 @@
     </layout>
    </item>
    <item>
-    <widget class="QGroupBox" name="groupBox">
+    <widget class="QGroupBox" name="options">
      <property name="title">
       <string>选项</string>
      </property>

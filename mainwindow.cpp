@@ -7,36 +7,16 @@
 #include <QClipboard>
 #include "global.h"
 #include "compileconfig.h"
+#include "findreplace.h"
 #include "subprocess.h"
 #include "aboutqdevcpp.h"
 
-static QList<CompileConfigure> config;
+static QList<CompileConfigure> compileConfig;
 static int currentConfigIdx;
 static QClipboard* clipboard;
+static FindReplaceConfig findConfig;
 
 CompileConfigure* currentConfig;
-
-void MainWindow::updateTab(int idx) {
-	if (idx == -1) {
-		ui->actionSave->setEnabled(false);
-		ui->actionSaveAs->setEnabled(false);
-		ui->actionClose->setEnabled(false);
-		ui->actionCloseAll->setEnabled(false);
-		ui->actionUndo->setEnabled(false);
-		ui->actionRedo->setEnabled(false);
-		ui->actionCopy->setEnabled(false);
-		ui->actionCut->setEnabled(false);
-	} else {
-		ui->actionSave->setEnabled(true);
-		ui->actionSaveAs->setEnabled(true);
-		ui->actionClose->setEnabled(true);
-		ui->actionCloseAll->setEnabled(true);
-		info[currentEditor()]->updateUndoRedoState();
-		info[currentEditor()]->updateCopyCutState();
-	}
-	updateCompileActions();
-	updatePasteAction();
-}
 
 QsciLexerCPP* createLexer() {
 	QsciLexerCPP* lexer = new QsciLexerCPP;
@@ -53,6 +33,25 @@ QsciScintilla* createEditor(QWidget* parent) {
 	return editor;
 }
 
+template <typename Type>
+void loadMultiConfig(QList<Type>& config, QJsonArray array) {
+	config.clear();
+	for (auto it = array.begin(); it != array.end(); ++it) {
+		Type cfg;
+		cfg.fromJson(*it);
+		config.push_back(cfg);
+	}
+}
+
+template <typename Type>
+QJsonArray saveMultiConfig(const QList<Type>& config) {
+	QJsonArray array;
+	for (const auto& cfg : config) {
+		array.append(cfg.toJson());
+	}
+	return array;
+}
+
 void loadConfig() {
 	QFile file("qdevcpp.json");
 	if (!file.open(QIODevice::ReadOnly)) {
@@ -62,15 +61,11 @@ void loadConfig() {
 	doc = QJsonDocument::fromJson(file.readAll());
 	file.close();
 	QJsonObject obj = doc.object();
-	QJsonArray compileconfig = obj["CompileConfig"].toArray();
-	for (auto it = compileconfig.begin(); it != compileconfig.end(); ++it) {
-		CompileConfigure cfg;
-		cfg.fromJson(it->toObject());
-		config.push_back(cfg);
-	}
-	if (config.size()) {
+	loadMultiConfig(compileConfig, obj["CompileConfig"].toArray());
+	findConfig.fromJson(obj["FindConfig"]);
+	if (compileConfig.size()) {
 		currentConfigIdx = obj["CurrentCompileConfig"].toInt();
-		currentConfig = &config[currentConfigIdx];
+		currentConfig = &compileConfig[currentConfigIdx];
 	} else {
 		currentConfigIdx = -1;
 		currentConfig = nullptr;
@@ -83,12 +78,9 @@ void saveConfig() {
 		return;
 	}
 	QJsonObject obj;
-	QJsonArray compileconfig;
-	for (const auto& cfg : config) {
-		compileconfig.append(cfg.toJson());
-	}
-	obj.insert("CompileConfig", compileconfig);
+	obj.insert("CompileConfig", saveMultiConfig(compileConfig));
 	obj.insert("CurrentCompileConfig", currentConfigIdx);
+	obj.insert("FindConfig", findConfig.toJson());
 	QJsonDocument doc(obj);
 	file.write(doc.toJson());
 	file.close();
@@ -167,7 +159,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		}
 	});
 	connect(ui->actionFindReplace, &QAction::triggered, [&]() {
-//		currentEditor()->findFirst()
+		if (!finddlg) {
+			finddlg = new FindReplace(findConfig, this);
+		}
+		finddlg->show();
 	});
 	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {
 		closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(idx)));
@@ -198,12 +193,12 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 
 	});
 	connect(ui->actionCompileConfig, &QAction::triggered, [&]() {
-		CompileConfig dlg(config, currentConfigIdx, this);
+		CompileConfig dlg(compileConfig, currentConfigIdx, this);
 		if (QDialog::Accepted == dlg.exec()) {
-			config = dlg.configure();
+			compileConfig = dlg.configure();
 			currentConfigIdx = dlg.currentConfigure();
 			if (currentConfigIdx != -1) {
-				currentConfig = &config[currentConfigIdx];
+				currentConfig = &compileConfig[currentConfigIdx];
 			} else {
 				currentConfig = nullptr;
 			}
@@ -254,6 +249,31 @@ bool MainWindow::closeTab(QsciScintilla* e) {
 	return true;
 }
 
+void MainWindow::updateTab(int idx) {
+	if (idx == -1) {
+		ui->actionSave->setEnabled(false);
+		ui->actionSaveAs->setEnabled(false);
+		ui->actionClose->setEnabled(false);
+		ui->actionCloseAll->setEnabled(false);
+		ui->actionUndo->setEnabled(false);
+		ui->actionRedo->setEnabled(false);
+		ui->actionCopy->setEnabled(false);
+		ui->actionCut->setEnabled(false);
+		finddlg->setEditorInfo(nullptr);
+	} else {
+		ui->actionSave->setEnabled(true);
+		ui->actionSaveAs->setEnabled(true);
+		ui->actionClose->setEnabled(true);
+		ui->actionCloseAll->setEnabled(true);
+		EditorInfo* ei = info[currentEditor()];
+		ei->updateUndoRedoState();
+		ei->updateCopyCutState();
+		finddlg->setEditorInfo(ei);
+	}
+	updateCompileActions();
+	updatePasteAction();
+}
+
 void MainWindow::updateCompileActions() {
 	bool enabled = currentEditor();
 	ui->actionRun->setEnabled(enabled);
@@ -265,8 +285,4 @@ void MainWindow::updateCompileActions() {
 
 void MainWindow::updatePasteAction() {
 	ui->actionPaste->setEnabled(currentEditor() && clipboard->text().length());
-}
-
-EditorInfo* MainWindow::infoOf(QsciScintilla* editor) {
-	return info[editor];
 }

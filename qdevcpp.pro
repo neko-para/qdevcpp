@@ -40,7 +40,9 @@ HEADERS += \
     subprocess.h \
     editorinfo.h \
     aboutqdevcpp.h \
-    findreplace.h
+    findreplace.h \
+    config.h \
+    confighelp.h
 
 FORMS += \
         mainwindow.ui \
