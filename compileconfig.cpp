@@ -5,7 +5,6 @@
 #include <QFileDialog>
 #include <QProcess>
 #include <QMessageBox>
-#include <QDebug>
 #include <QJsonArray>
 #include <QInputDialog>
 
@@ -32,8 +31,8 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	QJsonObject obj = value.toObject();
 #define JSON_OBJ obj
 	JSON_GET(name);
-	JSON_SET(gccPath);
-	JSON_SET(gdbPath);
+	JSON_GET(gccPath);
+	JSON_GET(gdbPath);
 	JSON_GET(extraCompile);
 	JSON_GET(extraLink);
 	JSON_GET(optimize);
