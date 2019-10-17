@@ -51,6 +51,8 @@ public:
 	bool shallSyntaxHighlight() const;
 	bool compile() const;
 	void run();
+signals:
+	void pathChange(QString p);
 };
 
 

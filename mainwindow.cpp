@@ -1,7 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QMessageBox>
-#include <Qsci/qscilexercpp.h>
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QClipboard>
@@ -38,15 +37,8 @@ void MainWindow::updateTab(int idx) {
 	updatePasteAction();
 }
 
-QsciLexerCPP* createLexer() {
-	QsciLexerCPP* lexer = new QsciLexerCPP;
-	lexer->setFont(QFont("ubuntu mono"));
-	return lexer;
-}
-
 QsciScintilla* createEditor(QWidget* parent) {
 	QsciScintilla* editor = new QsciScintilla(parent);
-	editor->setLexer(createLexer());
 	editor->setTabWidth(4);
 	editor->setMarginWidth(0, "000000");
 	editor->setMarginLineNumbers(0, true);

@@ -3,6 +3,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
+#include <Qsci/qscilexercpp.h>
 #include "global.h"
 #include "compileconfig.h"
 #include "ui_mainwindow.h"
@@ -27,10 +28,28 @@ void EditorInfo::updateCopyCutState() {
 	ui->actionCut->setEnabled(e);
 }
 
+QsciLexerCPP* createLexer() {
+	QsciLexerCPP* lexer = new QsciLexerCPP;
+	lexer->setFont(QFont("ubuntu mono"));
+	return lexer;
+}
+
 EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow *ui) : editor(e), ui(ui) {
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateCopyCutState);
+	connect(this, &EditorInfo::pathChange, [&](QString path) {
+		if (shallSyntaxHighlight()) {
+			if (!editor->lexer()) {
+				editor->setLexer(createLexer());
+			}
+		} else {
+			if (editor->lexer()) {
+				editor->lexer()->deleteLater();
+				editor->setLexer(0);
+			}
+		}
+	});
 }
 
 EditorInfo::~EditorInfo()  {
@@ -53,6 +72,7 @@ void EditorInfo::generateUntitled()  {
 		id = ++untitled_next;
 	}
 	path = QString("#%1").arg(id);
+	emit pathChange(path);
 }
 
 QString EditorInfo::generateName() const {
@@ -78,6 +98,7 @@ bool EditorInfo::open(const QString& cpath)  {
 		editor->setText(QString::fromUtf8(buffer));
 		delete[] buffer;
 		editor->setModified(false);
+		emit pathChange(path);
 		return true;
 	} else {
 		file.close();
@@ -96,7 +117,10 @@ bool EditorInfo::write(const QString& cpath)  {
 	}
 	if (buffer.size() == file.write(buffer)) {
 		file.close();
-		path = cpath;
+		if (path != cpath) {
+			path = cpath;
+			emit pathChange(path);
+		}
 		editor->setModified(false);
 		return true;
 	} else {
