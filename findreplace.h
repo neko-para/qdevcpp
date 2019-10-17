@@ -8,6 +8,16 @@ namespace Ui {
 	class FindReplace;
 }
 
+struct FindReplaceConfig {
+	bool useRegex = false;
+	bool caseInsensitive = false;
+	bool matchWord = false;
+	bool informBeforeReplace = false;
+	bool findAll = false;
+	bool startAtBegin = false;
+	bool onlyInSelected = false;
+};
+
 class FindReplace : public QDialog {
 	Q_OBJECT
 
