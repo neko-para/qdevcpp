@@ -166,6 +166,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			close();
 		}
 	});
+	connect(ui->actionFindReplace, &QAction::triggered, [&]() {
+//		currentEditor()->findFirst()
+	});
 	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {
 		closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(idx)));
 	});
@@ -262,4 +265,8 @@ void MainWindow::updateCompileActions() {
 
 void MainWindow::updatePasteAction() {
 	ui->actionPaste->setEnabled(currentEditor() && clipboard->text().length());
+}
+
+EditorInfo* MainWindow::infoOf(QsciScintilla* editor) {
+	return info[editor];
 }

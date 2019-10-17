@@ -80,6 +80,7 @@
     <property name="title">
      <string>搜索</string>
     </property>
+    <addaction name="actionFindReplace"/>
    </widget>
    <widget class="QMenu" name="menuVisual">
     <property name="title">
@@ -114,6 +115,8 @@
      <string>工具</string>
     </property>
     <addaction name="actionCompileConfig"/>
+    <addaction name="action"/>
+    <addaction name="action_2"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -508,6 +511,24 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+V</string>
+   </property>
+  </action>
+  <action name="actionFindReplace">
+   <property name="text">
+    <string>搜索替换</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+H</string>
+   </property>
+  </action>
+  <action name="action">
+   <property name="text">
+    <string>环境选项</string>
+   </property>
+  </action>
+  <action name="action_2">
+   <property name="text">
+    <string>编辑器选项</string>
    </property>
   </action>
  </widget>

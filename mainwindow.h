@@ -28,6 +28,8 @@ public:
 
 	bool closeTab(QsciScintilla* e);
 
+	static EditorInfo* infoOf(QsciScintilla* editor);
+
 private slots:
 	void updateTab(int idx);
 	void updateCompileActions();
