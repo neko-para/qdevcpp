@@ -43,6 +43,7 @@ struct CompileConfigure : public Config {
 	};
 	QString name = "新配置";
 	QString gccPath = "";
+	QString gdbPath = "";
 	QString extraCompile = "";
 	QString extraLink = "";
 	int optimize = O_NONE;

@@ -14,6 +14,7 @@ QJsonValue CompileConfigure::toJson() const {
 #define JSON_OBJ obj
 	JSON_SET(name);
 	JSON_SET(gccPath);
+	JSON_SET(gdbPath);
 	JSON_SET(extraCompile);
 	JSON_SET(extraLink);
 	JSON_SET(optimize);
@@ -31,7 +32,8 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	QJsonObject obj = value.toObject();
 #define JSON_OBJ obj
 	JSON_GET(name);
-	JSON_GET(gccPath);
+	JSON_SET(gccPath);
+	JSON_SET(gdbPath);
 	JSON_GET(extraCompile);
 	JSON_GET(extraLink);
 	JSON_GET(optimize);
@@ -90,9 +92,12 @@ CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *pare
 			ui->configDel->setEnabled(false);
 			ui->configDup->setEnabled(false);
 			ui->configRen->setEnabled(false);
-			ui->gccLable->setEnabled(false);
+			ui->gccLabel->setEnabled(false);
 			ui->gccPath->setEnabled(false);
 			ui->gccBrowse->setEnabled(false);
+			ui->gdbLabel->setEnabled(false);
+			ui->gdbPath->setEnabled(false);
+			ui->gdbBrowse->setEnabled(false);
 			ui->configTab->setEnabled(false);
 		} else {
 			currentConfig = &config[current];
@@ -100,10 +105,14 @@ CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *pare
 			ui->configDel->setEnabled(true);
 			ui->configDup->setEnabled(true);
 			ui->configRen->setEnabled(true);
-			ui->gccLable->setEnabled(true);
+			ui->gccLabel->setEnabled(true);
 			ui->gccPath->setEnabled(true);
 			ui->gccPath->setText(currentConfig->gccPath);
 			ui->gccBrowse->setEnabled(true);
+			ui->gdbLabel->setEnabled(true);
+			ui->gdbPath->setEnabled(true);
+			ui->gdbPath->setText(currentConfig->gdbPath);
+			ui->gdbBrowse->setEnabled(true);
 			ui->configTab->setEnabled(true);
 			ui->extraCompile->clear();
 			ui->extraCompile->insertPlainText(currentConfig->extraCompile);
@@ -139,16 +148,30 @@ CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *pare
 		}
 	});
 	connect(ui->gccBrowse, &QToolButton::clicked, [&]() {
-		QString path = QFileDialog::getOpenFileName(this, "qdevcpp - 打开gcc", "", "gcc (gcc" + exeSuf + ")");
+		QString path = QFileDialog::getOpenFileName(this, "qdevcpp - 打开gcc",
+#ifdef Q_OS_LINUX
+													"/usr/bin"
+#elif defined(Q_OS_WINDOWS)
+													""
+#endif
+													, "gcc (*gcc" + exeSuf + ")");
 		if (path != "") {
 			currentConfig->gccPath = path;
 			ui->gccPath->setText(path);
 		}
-		// gcc -v -x c - -pipe
-		// gcc -v -x c++ - -pipe
-		// #include <...> search starts here:
-		// End of search list.
-		// LIBRARY_PATH=
+	});
+	connect(ui->gdbBrowse, &QToolButton::clicked, [&]() {
+		QString path = QFileDialog::getOpenFileName(this, "qdevcpp - 打开gdb",
+#ifdef Q_OS_LINUX
+													"/usr/bin"
+#elif defined(Q_OS_WINDOWS)
+													""
+#endif
+													, "gdb (*gdb" + exeSuf + ")");
+		if (path != "") {
+			currentConfig->gdbPath = path;
+			ui->gdbPath->setText(path);
+		}
 	});
 	connect(ui->extraCompile, &QPlainTextEdit::textChanged, [&]() {
 		currentConfig->extraCompile = ui->extraCompile->toPlainText();

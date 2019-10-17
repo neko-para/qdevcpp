@@ -33,6 +33,7 @@ private slots:
 	void updateTab(int idx);
 	void updateCompileActions();
 	void updatePasteAction();
+	void updateWindowTitle();
 
 private:
 	Ui::MainWindow *ui;

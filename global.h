@@ -6,7 +6,7 @@
 
 #if defined(Q_OS_WIN32)
 const QChar pathSep = ';';
-const QString exeSuf = ".exe"
+const QString exeSuf = ".exe";
 #elif defined(Q_OS_LINUX)
 const QChar pathSep = ':';
 const QString exeSuf = "";

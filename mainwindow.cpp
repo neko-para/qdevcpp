@@ -107,6 +107,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		QsciScintilla* e = createEditor(ui->SrcTab);
 		auto& ei = info[e];
 		ei = new EditorInfo(e, ui);
+		connect(ei, &EditorInfo::pathChange, this, &MainWindow::updateWindowTitle);
 		ei->generateUntitled();
 		ui->SrcTab->addTab(e, ei->generateTitle());
 		ui->SrcTab->setCurrentWidget(e);
@@ -120,6 +121,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			QsciScintilla* e = createEditor(ui->SrcTab);
 			auto& ei = info[e];
 			ei = new EditorInfo(e, ui);
+			connect(ei, &EditorInfo::pathChange, this, &MainWindow::updateWindowTitle);
 			if (ei->open(p)) {
 				ui->SrcTab->addTab(e, ei->generateTitle());
 				ui->SrcTab->setCurrentWidget(e);
@@ -262,6 +264,7 @@ void MainWindow::updateTab(int idx) {
 	}
 	updateCompileActions();
 	updatePasteAction();
+	updateWindowTitle();
 }
 
 void MainWindow::updateCompileActions() {
@@ -275,4 +278,13 @@ void MainWindow::updateCompileActions() {
 
 void MainWindow::updatePasteAction() {
 	ui->actionPaste->setEnabled(currentEditor() && clipboard->text().length());
+}
+
+void MainWindow::updateWindowTitle() {
+	if (currentEditor()) {
+		EditorInfo* ei = info[currentEditor()];
+		setWindowTitle(QString("%1 - QDevCpp").arg(ei->generateName()));
+	} else {
+		setWindowTitle("QDevCpp");
+	}
 }

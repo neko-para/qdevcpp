@@ -186,8 +186,8 @@ bool EditorInfo::compile() const {
 	QTimer timeout;
 	timeout.setInterval(30 * 1000);
 	timeout.setSingleShot(true);
-	connect(&proc, QOverload<int>::of(&QProcess::finished), [&](int code) {
-		retCode = code;
+	connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [&](int exitCode) {
+		retCode = exitCode;
 		loop.quit();
 	});
 	connect(&timeout, &QTimer::timeout, [&]() {

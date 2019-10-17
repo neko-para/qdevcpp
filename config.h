@@ -4,6 +4,7 @@
 #include <QJsonValue>
 
 struct Config {
+	virtual ~Config() {}
 	virtual QJsonValue toJson() const = 0;
 	virtual void fromJson(QJsonValue value) = 0;
 };
