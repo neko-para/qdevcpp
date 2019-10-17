@@ -1,6 +1,7 @@
 #ifndef EDITORINFO_H
 #define EDITORINFO_H
 
+#include <QDateTime>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 
@@ -12,6 +13,7 @@ class EditorInfo : public QObject {
 	Q_OBJECT
 
 	friend class FindReplace;
+	friend class MainWindow;
 
 	QsciScintilla* editor;
 	Ui::MainWindow* ui;
@@ -19,6 +21,7 @@ class EditorInfo : public QObject {
 	bool modified = false;
 	bool canUndo;
 	bool canRedo;
+	QDateTime whenOpen;
 
 	static int untitled_next;
 	static QList<int> untitled_rest;
@@ -53,8 +56,10 @@ public:
 	bool shallSyntaxHighlight() const;
 	bool compile() const;
 	void run();
+	bool isModifiedByOthers() const;
+	void reload();
 signals:
-	void pathChange(QString p);
+	void pathChange(QString cpath, QString ppath);
 };
 
 

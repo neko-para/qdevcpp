@@ -11,10 +11,11 @@
 #include "aboutqdevcpp.h"
 
 static QList<CompileConfigure> compileConfig;
-static int currentConfigIdx;
-static QClipboard* clipboard;
+static int currentConfigIdx = -1;
+static QClipboard* clipboard = nullptr;
 static FindReplaceConfig findConfig;
 
+MainWindow* window;
 CompileConfigure* currentConfig;
 
 QsciScintilla* createEditor(QWidget* parent) {
@@ -22,6 +23,7 @@ QsciScintilla* createEditor(QWidget* parent) {
 	editor->setTabWidth(4);
 	editor->setMarginWidth(0, "000000");
 	editor->setMarginLineNumbers(0, true);
+	editor->installEventFilter(window);
 	return editor;
 }
 
@@ -79,10 +81,13 @@ void saveConfig() {
 }
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
+	::window = this;
 	ui->setupUi(this);
 	ui->compileResult->horizontalHeader()->setStretchLastSection(true);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+	ui->compileResult->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+	ui->compileResult->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 	loadConfig();
 	clipboard = QApplication::clipboard();
 	finddlg = new FindReplace(findConfig, this);
@@ -107,8 +112,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		QsciScintilla* e = createEditor(ui->SrcTab);
 		auto& ei = info[e];
 		ei = new EditorInfo(e, ui);
-		connect(ei, &EditorInfo::pathChange, this, &MainWindow::updateWindowTitle);
-		ei->generateUntitled();
 		ui->SrcTab->addTab(e, ei->generateTitle());
 		ui->SrcTab->setCurrentWidget(e);
 	});
@@ -118,24 +121,36 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			return;
 		}
 		for (const auto& p : paths) {
-			QsciScintilla* e = createEditor(ui->SrcTab);
-			auto& ei = info[e];
-			ei = new EditorInfo(e, ui);
-			connect(ei, &EditorInfo::pathChange, this, &MainWindow::updateWindowTitle);
-			if (ei->open(p)) {
-				ui->SrcTab->addTab(e, ei->generateTitle());
-				ui->SrcTab->setCurrentWidget(e);
+			auto pei = findTab(p);
+			if (pei) {
+				ui->SrcTab->setCurrentWidget(pei->editor);
+				pei->editor->setFocus();
 			} else {
-				ei->deleteLater();
-				info.remove(e);
+				QsciScintilla* e = createEditor(ui->SrcTab);
+				auto& ei = info[e];
+				ei = new EditorInfo(e, ui);
+				if (ei->open(p)) {
+					ui->SrcTab->addTab(e, ei->generateTitle());
+					ui->SrcTab->setCurrentWidget(e);
+				} else {
+					ei->deleteLater();
+				}
 			}
 		}
 	});
 	connect(ui->actionSave, &QAction::triggered, [&]() {
-		info[currentEditor()]->save();
+		auto ei = info[currentEditor()];
+		if (!ei->save()) {
+			return;
+		}
+		removeOther(ei);
 	});
 	connect(ui->actionSaveAs, &QAction::triggered, [&]() {
-		info[currentEditor()]->saveas();
+		auto ei = info[currentEditor()];
+		if (!ei->saveas()) {
+			return;
+		}
+		removeOther(ei);
 	});
 	connect(ui->actionClose, &QAction::triggered, [&]() {
 		closeTab(currentEditor());
@@ -169,6 +184,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		if (!ei->save()) {
 			return;
 		}
+		removeOther(ei);
 		ui->compileInfo->setCurrentIndex(ei->compile());
 	});
 	connect(ui->actionRun, &QAction::triggered, [&]() {
@@ -179,6 +195,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		if (!ei->save()) {
 			return;
 		}
+		removeOther(ei);
 		if (ei->compile()) {
 			ei->run();
 		}
@@ -203,19 +220,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	});
 	connect(ui->actionAboutQt, &QAction::triggered, &QApplication::aboutQt);
 	connect(ui->compileResult, &QTableWidget::doubleClicked, [&](const QModelIndex& idx) {
-		QString row, col;
-		row = ui->compileResult->item(idx.row(), 0)->text();
-		col = ui->compileResult->item(idx.row(), 1)->text();
-		int nrow = 0, ncol = 0;
-		if (row.length()) {
-			nrow = row.toInt() - 1;
-			if (col.length()) {
-				ncol = col.toInt() - 1;
+		QString file, row, col;
+		file = ui->compileResult->item(idx.row(), 0)->text();
+		row = ui->compileResult->item(idx.row(), 1)->text();
+		col = ui->compileResult->item(idx.row(), 2)->text();
+		if (QFileInfo(file).exists()) {
+			auto ei = findTab(file);
+			if (!ei) {
+				return;
 			}
-			// WARNING! when tab changes, it may behave randomly, even crash.
-			// TODO: cache error log for each file.
-			currentEditor()->setCursorPosition(nrow, ncol);
-			currentEditor()->setFocus();
+			ui->SrcTab->setCurrentWidget(ei->editor);
+			ei->editor->setFocus();
+			int nrow = 0, ncol = 0;
+			if (row.length()) {
+				nrow = row.toInt() - 1;
+				if (col.length()) {
+					ncol = col.toInt() - 1;
+				}
+				ei->editor->setCursorPosition(nrow, ncol);
+			}
 		}
 	});
 }
@@ -237,8 +260,24 @@ bool MainWindow::closeTab(QsciScintilla* e) {
 	ui->SrcTab->removeTab(ui->SrcTab->indexOf(e));
 	updateTab(ui->SrcTab->currentIndex());
 	ei->deleteLater();
-	info.remove(e);
 	return true;
+}
+
+EditorInfo* MainWindow::findTab(const QString& path, EditorInfo* except) {
+	for (auto ei : info.values()) {
+		if (except != ei && ei->path == path) {
+			return ei;
+		}
+	}
+	return nullptr;
+}
+
+void MainWindow::removeOther(EditorInfo* ei) {
+	auto pei = findTab(ei->path, ei);
+	if (pei) {
+		ui->SrcTab->removeTab(ui->SrcTab->indexOf(pei->editor));
+		pei->deleteLater();
+	}
 }
 
 void MainWindow::updateTab(int idx) {
@@ -265,6 +304,7 @@ void MainWindow::updateTab(int idx) {
 	updateCompileActions();
 	updatePasteAction();
 	updateWindowTitle();
+
 }
 
 void MainWindow::updateCompileActions() {
@@ -287,4 +327,15 @@ void MainWindow::updateWindowTitle() {
 	} else {
 		setWindowTitle("QDevCpp");
 	}
+}
+
+bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
+	QsciScintilla* e = dynamic_cast<QsciScintilla*>(watched);
+	if (event->type() == QEvent::FocusIn && e) {
+		auto ei = info[e];
+		if (ei->isModifiedByOthers()) {
+			ei->reload();
+		}
+	}
+	return QMainWindow::eventFilter(watched, event);
 }

@@ -27,7 +27,7 @@ bool SubProcess::start() {
 		return false;
 	} else {
 		timeout.stop();
-		connect(proc, QOverload<int>::of(&QProcess::finished), this, &SubProcess::fin);
+		connect(proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &SubProcess::fin);
 		return true;
 	}
 }

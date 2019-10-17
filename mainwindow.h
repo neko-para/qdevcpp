@@ -21,6 +21,8 @@ namespace Ui {
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
+	friend class EditorInfo;
+
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
@@ -28,12 +30,17 @@ public:
 	QsciScintilla* currentEditor();
 
 	bool closeTab(QsciScintilla* e);
+	EditorInfo* findTab(const QString& path, EditorInfo* except = nullptr);
+	void removeOther(EditorInfo* ei);
 
-private slots:
+public slots:
 	void updateTab(int idx);
 	void updateCompileActions();
 	void updatePasteAction();
 	void updateWindowTitle();
+
+protected:
+	virtual bool eventFilter(QObject *watched, QEvent *event);
 
 private:
 	Ui::MainWindow *ui;

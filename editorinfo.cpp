@@ -6,6 +6,7 @@
 #include <Qsci/qscilexercpp.h>
 #include "global.h"
 #include "compileconfig.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "subprocess.h"
 
@@ -34,7 +35,7 @@ QsciLexerCPP* createLexer() {
 	return lexer;
 }
 
-EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow *ui) : editor(e), ui(ui) {
+EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateCopyCutState);
@@ -50,6 +51,9 @@ EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow *ui) : editor(e), ui(ui)
 			}
 		}
 	});
+
+	connect(this, &EditorInfo::pathChange, window, &MainWindow::updateWindowTitle);
+	generateUntitled();
 }
 
 EditorInfo::~EditorInfo()  {
@@ -60,6 +64,7 @@ EditorInfo::~EditorInfo()  {
 		editor->lexer()->deleteLater();
 		editor->setLexer(0);
 	}
+	window->info.remove(editor);
 	editor->deleteLater();
 }
 
@@ -71,12 +76,14 @@ void EditorInfo::generateUntitled()  {
 	} else {
 		id = ++untitled_next;
 	}
-	path = QString("#%1").arg(id);
-	emit pathChange(path);
+	QString cpath = QString("#%1").arg(id);
+	QString ppath = path;
+	path = cpath;
+	emit pathChange(cpath, ppath);
 }
 
 QString EditorInfo::generateName() const {
-	if (path[0] == '#') {
+	if (isUntitled()) {
 		return QString("未命名 %1").arg(path.mid(1));
 	} else {
 		return QFileInfo(path).fileName();
@@ -86,7 +93,7 @@ QString EditorInfo::generateName() const {
 bool EditorInfo::open(const QString& cpath)  {
 	QFile file(cpath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		ui->compileLog->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));;
+		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));;
 		return false;
 	}
 	qint64 length = file.size();
@@ -94,16 +101,18 @@ bool EditorInfo::open(const QString& cpath)  {
 	if (length == file.read(buffer, length)) {
 		file.close();
 		buffer[length] = 0;
+		QString ppath = path;
 		path = cpath;
+		emit pathChange(cpath, ppath);
 		editor->setText(QString::fromUtf8(buffer));
 		delete[] buffer;
 		editor->setModified(false);
-		emit pathChange(path);
+		whenOpen = QFileInfo(path).lastModified();
 		return true;
 	} else {
 		file.close();
 		delete[] buffer;
-		ui->compileLog->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
 		return false;
 	}
 }
@@ -112,20 +121,22 @@ bool EditorInfo::write(const QString& cpath)  {
 	auto buffer = editor->text().toUtf8();
 	QFile file(cpath);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-		ui->compileLog->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
 		return false;
 	}
 	if (buffer.size() == file.write(buffer)) {
 		file.close();
 		if (path != cpath) {
+			QString ppath = path;
 			path = cpath;
-			emit pathChange(path);
+			emit pathChange(cpath, ppath);
 		}
 		editor->setModified(false);
+		whenOpen = QFileInfo(path).lastModified();
 		return true;
 	} else {
 		file.close();
-		ui->compileLog->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
 		return false;
 	}
 }
@@ -178,8 +189,9 @@ static QTableWidgetItem* generateItem(const QString& s, int align = Qt::AlignCen
 
 bool EditorInfo::compile() const {
 	QProcess proc;
+	proc.setEnvironment(QProcess::systemEnvironment() << "LANGUAGE=en_US.UTF-8");
 	currentConfig->start(proc, path);
-	ui->compileLog->appendPlainText(QString("[执行]%1").arg(currentConfig->gccPath));
+	ui->Log->appendPlainText(QString("[执行]%1").arg(currentConfig->gccPath));
 	proc.setReadChannel(QProcess::StandardError);
 	int retCode = -1;
 	QEventLoop loop;
@@ -195,35 +207,33 @@ bool EditorInfo::compile() const {
 		loop.exit(1);
 	});
 	if (loop.exec()) {
-		ui->compileLog->appendPlainText(QString("[错误]运行超时"));
+		ui->Log->appendPlainText(QString("[错误]运行超时"));
 		return false;
 	} else {
 		timeout.stop();
 	}
 	QString output = QString::fromUtf8(proc.readAll());
-	ui->compileResult->clearContents();
-	int crow = 0;
-	for (QString err : output.split('\n')) {
-		if (err.startsWith(path)) {
-			QString row, col, info;
-			err = err.mid(path.length() + 1); // IGNORE 'xxx.cpp:'
-			QRegularExpression rc(R"(^([0-9]+):([0-9]+):)");
-			auto match = rc.match(err);
-			if (match.hasMatch()) {
-				row = match.captured(1);
-				col = match.captured(2);
-				err = err.mid(match.captured(0).length());
-			}
-			info = err.mid(1); // ignore ' '
-			ui->compileResult->insertRow(crow);
-
-			ui->compileResult->setItem(crow, 0, generateItem(row));
-			ui->compileResult->setItem(crow, 1, generateItem(col));
-			ui->compileResult->setItem(crow, 2, generateItem(info, Qt::AlignVCenter));
-			++crow;
-		}
+	if (output.length()) {
+		ui->Log->appendPlainText(QString("[输出]%1").arg(output));
 	}
-	ui->compileLog->appendPlainText(QString("[返回]%1").arg(retCode));
+	ui->compileResult->clearContents();
+	ui->compileResult->setRowCount(0);
+	int crow = 0;
+	for (QString err : output.split('\n', QString::SkipEmptyParts)) {
+		QRegularExpression pattern(R"(^([\s\S]+?)(?::([0-9]+)(?::([0-9]+))?)?: (?:(error|warning|note): )?([\s\S]+)$)");
+		auto match = pattern.match(err);
+		if (!match.hasMatch()) {
+			continue;
+		}
+		ui->compileResult->insertRow(crow);
+		ui->compileResult->setItem(crow, 0, generateItem(match.captured(1), Qt::AlignVCenter));
+		ui->compileResult->setItem(crow, 1, generateItem(match.captured(2)));
+		ui->compileResult->setItem(crow, 2, generateItem(match.captured(3)));
+		ui->compileResult->setItem(crow, 3, generateItem(match.captured(4)));
+		ui->compileResult->setItem(crow, 4, generateItem(match.captured(5), Qt::AlignVCenter));
+		++crow;
+	}
+	ui->Log->appendPlainText(QString("[返回]%1").arg(retCode));
 	return !retCode;
 }
 
@@ -234,10 +244,21 @@ void EditorInfo::run() {
 	QFileInfo si(path);
 	QString exe = si.path() + QDir::separator() + si.baseName() + exeSuf;
 	if (!QFileInfo(exe).exists()) {
-		if (QMessageBox::Yes == QMessageBox::question(editor, "qdevcpp", "代码尚未编译，是否现在编译？", QMessageBox::Yes, QMessageBox::No)) {
-//			compilerun();
-		}
+		QMessageBox::warning(editor, "qdevcpp", "代码尚未编译");
+	} else {
+		SubProcess* sp = new SubProcess(ui->Log, exe, editor);
+		sp->start();
 	}
-	SubProcess* sp = new SubProcess(ui->compileLog, exe, editor);
-	sp->start();
+}
+
+bool EditorInfo::isModifiedByOthers() const {
+	return isUntitled() ? false : whenOpen != QFileInfo(path).lastModified();
+}
+
+void EditorInfo::reload() {
+	int line, index;
+	editor->getCursorPosition(&line, &index);
+	if (open(path)) {
+		editor->setCursorPosition(line, index);
+	}
 }

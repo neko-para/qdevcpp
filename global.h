@@ -12,7 +12,10 @@ const QChar pathSep = ':';
 const QString exeSuf = "";
 #endif
 
+class MainWindow;
+
 const QStringList cSuf = {"c"};
 const QStringList cxxSuf = {"cpp", "cxx", "cc"};
+extern MainWindow* window;
 
 #endif // GLOBAL_H
