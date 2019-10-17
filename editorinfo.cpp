@@ -38,7 +38,7 @@ EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow *ui) : editor(e), ui(ui)
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateCopyCutState);
-	connect(this, &EditorInfo::pathChange, [&](QString path) {
+	connect(this, &EditorInfo::pathChange, [&](QString) {
 		if (shallSyntaxHighlight()) {
 			if (!editor->lexer()) {
 				editor->setLexer(createLexer());

@@ -6,12 +6,12 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>304</width>
-    <height>404</height>
+    <width>358</width>
+    <height>439</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Dialog</string>
+   <string>查找替换</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
    <item>
@@ -83,6 +83,13 @@
        </widget>
       </item>
       <item>
+       <widget class="QCheckBox" name="onlyInSelected">
+        <property name="text">
+         <string>仅搜索选择区域</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QCheckBox" name="startAtBegin">
         <property name="text">
          <string>从开头搜索</string>
@@ -90,9 +97,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="onlyInSelected">
+       <widget class="QCheckBox" name="wrap">
         <property name="text">
-         <string>仅搜索选择区域</string>
+         <string>循环搜索</string>
         </property>
        </widget>
       </item>
@@ -112,6 +119,13 @@
       <widget class="QPushButton" name="replace">
        <property name="text">
         <string>替换</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="replaceAll">
+       <property name="text">
+        <string>替换全部</string>
        </property>
       </widget>
      </item>

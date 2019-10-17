@@ -85,6 +85,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
 	loadConfig();
 	clipboard = QApplication::clipboard();
+	finddlg = new FindReplace(findConfig, this);
 	connect(clipboard, &QClipboard::changed, this, &MainWindow::updatePasteAction);
 	connect(ui->actionUndo, &QAction::triggered, [&]() {
 		currentEditor()->undo();
@@ -151,9 +152,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		}
 	});
 	connect(ui->actionFindReplace, &QAction::triggered, [&]() {
-		if (!finddlg) {
-			finddlg = new FindReplace(findConfig, this);
-		}
 		finddlg->show();
 	});
 	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {

@@ -26,8 +26,9 @@ void FindReplaceConfig::fromJson(QJsonValue value) {
 	JSON_GET(matchWord);
 	JSON_GET(informBeforeReplace);
 	JSON_GET(findBackward);
-	JSON_GET(startAtBegin);
 	JSON_GET(onlyInSelected);
+	JSON_GET(startAtBegin);
+	JSON_GET(wrap);
 #undef JSON_OBJ
 }
 
@@ -36,8 +37,8 @@ FindReplace::FindReplace(FindReplaceConfig& cfg, QWidget *parent) : QDialog(pare
 #define BIND_CONFIG(key) \
 	do { \
 		ui->key->setChecked(config.key); \
-		connect(ui->key, &QCheckBox::toggled, [&](bool s) { \
-			config.key = s; \
+		connect(ui->key, &QCheckBox::toggled, [&](bool c) { \
+			config.key = c; \
 			findBefore = false; \
 		}); \
 	} while (false)
@@ -46,20 +47,47 @@ FindReplace::FindReplace(FindReplaceConfig& cfg, QWidget *parent) : QDialog(pare
 	BIND_CONFIG(matchWord);
 	BIND_CONFIG(informBeforeReplace);
 	BIND_CONFIG(findBackward);
-	BIND_CONFIG(startAtBegin);
 	BIND_CONFIG(onlyInSelected);
+	BIND_CONFIG(startAtBegin);
+	BIND_CONFIG(wrap);
+	connect(ui->onlyInSelected, &QCheckBox::toggled, [&](bool c) {
+		ui->startAtBegin->setEnabled(!c);
+		ui->wrap->setEnabled(!c);
+	});
 	connect(ui->findPattern, &QLineEdit::textChanged, [&]() {
 		findBefore = false;
 	});
 	connect(ui->find, &QPushButton::clicked, [&]() {
-		if (findBefore) {
-			if (!ei->editor->findNext()) {
-				QMessageBox::warning(this, "qdevcpp", QString("未找到‘%1’").arg(ui->findPattern->text()));
+		try {
+			if (findBefore) {
+				if (!ei->editor->findNext()) {
+					throw 0;
+				}
+			} else if (ei) {
+				findBefore = true;
+				if (config.onlyInSelected) {
+					if (!ei->editor->findFirstInSelection(ui->findPattern->text(), config.useRegex, !config.caseInsensitive, config.matchWord, !config.findBackward)) {
+						throw 0;
+					}
+				} else {
+					int line = -1, index = -1;
+					if (config.startAtBegin) {
+						if (config.findBackward) {
+							line = ei->editor->lines() - 1;
+							index = ei->editor->lineLength(line);
+						} else {
+							line = 0;
+							index = 0;
+						}
+					}
+					if (!ei->editor->findFirst(ui->findPattern->text(), config.useRegex, !config.caseInsensitive, config.matchWord, config.wrap, !config.findBackward, line, index)) {
+						throw 0;
+					}
+				}
+
 			}
-		} else if (ei) {
-			findBefore = true;
-//			if (ui->searchSelected->isChecked())
-//			ei->editor->findFirst()
+		} catch (...) {
+			QMessageBox::warning(this, "qdevcpp", QString("未找到‘%1’").arg(ui->findPattern->text()));
 		}
 	});
 	connect(ui->close, &QPushButton::clicked, this, &FindReplace::hide);

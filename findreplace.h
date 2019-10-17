@@ -15,8 +15,9 @@ struct FindReplaceConfig : public Config {
 	bool matchWord = false;
 	bool informBeforeReplace = false;
 	bool findBackward = false;
-	bool startAtBegin = false;
 	bool onlyInSelected = false;
+	bool startAtBegin = false;
+	bool wrap = false;
 
 	virtual QJsonValue toJson() const;
 	virtual void fromJson(QJsonValue value);
