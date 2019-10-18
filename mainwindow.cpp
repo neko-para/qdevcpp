@@ -83,6 +83,11 @@ void saveConfig() {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
 	::window = this;
 	ui->setupUi(this);
+	// Disable Debug
+	ui->dockDebug->setVisible(false);
+	ui->actionDebug->setEnabled(false);
+	ui->actionDebugToolDock->setEnabled(false);
+
 	ui->compileResult->horizontalHeader()->setStretchLastSection(true);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
