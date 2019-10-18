@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>275</width>
-    <height>406</height>
+    <width>269</width>
+    <height>371</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,16 +66,6 @@
        </widget>
       </item>
       <item>
-       <widget class="QCheckBox" name="informBeforeReplace">
-        <property name="text">
-         <string>替换前提示</string>
-        </property>
-        <property name="checked">
-         <bool>true</bool>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QCheckBox" name="findBackward">
         <property name="text">
          <string>向开头搜索</string>
@@ -101,31 +91,17 @@
        </property>
       </widget>
      </item>
-     <item row="2" column="4">
+     <item row="2" column="3">
       <widget class="QPushButton" name="close">
        <property name="text">
         <string>关闭</string>
        </property>
       </widget>
      </item>
-     <item row="2" column="2">
-      <widget class="QPushButton" name="replaceNext">
-       <property name="text">
-        <string>替换下一个</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="4">
+     <item row="1" column="3">
       <widget class="QPushButton" name="replaceAll">
        <property name="text">
         <string>替换全部</string>
-       </property>
-      </widget>
-     </item>
-     <item row="1" column="2">
-      <widget class="QPushButton" name="findNext">
-       <property name="text">
-        <string>查找下一个</string>
        </property>
       </widget>
      </item>

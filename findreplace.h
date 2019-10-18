@@ -13,10 +13,7 @@ struct FindReplaceConfig : public Config {
 	bool useRegex = false;
 	bool caseInsensitive = false;
 	bool matchWord = false;
-	bool informBeforeReplace = false;
 	bool findBackward = false;
-	bool onlyInSelected = false;
-	bool startAtBegin = false;
 	bool wrap = false;
 
 	virtual QJsonValue toJson() const;
@@ -31,7 +28,7 @@ public:
 	~FindReplace();
 
 	void setEditorInfo(EditorInfo* i);
-	void findFail();
+	bool findFail();
 
 private:
 	Ui::FindReplace *ui;
