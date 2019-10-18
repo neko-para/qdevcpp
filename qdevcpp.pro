@@ -49,5 +49,3 @@ FORMS += \
     compileconfig.ui \
     aboutqdevcpp.ui \
     findreplace.ui
-
-RESOURCES +=
