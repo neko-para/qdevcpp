@@ -30,6 +30,9 @@ public:
 	void setEditorInfo(EditorInfo* i);
 	bool findFail();
 
+protected:
+	virtual bool eventFilter(QObject* watched, QEvent* event);
+
 private:
 	Ui::FindReplace *ui;
 	EditorInfo* ei = nullptr;

@@ -3,6 +3,7 @@
 #include "confighelp.h"
 #include <QJsonObject>
 #include <QMessageBox>
+#include <QKeyEvent>
 
 QJsonValue FindReplaceConfig::toJson() const {
 	QJsonObject obj;
@@ -25,6 +26,8 @@ void FindReplaceConfig::fromJson(QJsonValue value) {
 
 FindReplace::FindReplace(FindReplaceConfig& cfg, QWidget *parent) : QDialog(parent), ui(new Ui::FindReplace), config(cfg) {
 	ui->setupUi(this);
+	ui->findPattern->installEventFilter(this);
+	ui->replacePattern->installEventFilter(this);
 	BIND_CONFIG_BOOL(useRegex);
 	BIND_CONFIG_BOOL(caseInsensitive);
 	BIND_CONFIG_BOOL(matchWord);
@@ -116,4 +119,16 @@ void FindReplace::setEditorInfo(EditorInfo* i) {
 bool FindReplace::findFail() {
 	QMessageBox::warning(this, "qdevcpp", QString("未找到‘%1’").arg(ui->findPattern->text()));
 	return true;
+}
+
+bool FindReplace::eventFilter(QObject* watched, QEvent* event) {
+	QLineEdit* le = dynamic_cast<QLineEdit*>(watched);
+	if (le && event->type() == QEvent::KeyPress) {
+		QKeyEvent* ke = dynamic_cast<QKeyEvent*>(event);
+		if (ke->key() == Qt::Key_Tab) {
+			le->insert("\t");
+			return true;
+		}
+	}
+	return QDialog::eventFilter(watched, event);
 }
