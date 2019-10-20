@@ -10,7 +10,6 @@
 
 QJsonValue CompileConfigure::toJson() const {
 	QJsonObject obj;
-#define JSON_OBJ obj
 	JSON_SET(name);
 	JSON_SET(gccPath);
 	JSON_SET(gdbPath);
@@ -23,13 +22,11 @@ QJsonValue CompileConfigure::toJson() const {
 	JSON_SET(warning);
 	JSON_SET(werror);
 	JSON_SET(debug);
-#undef JSON_OBJ
 	return obj;
 }
 
 void CompileConfigure::fromJson(QJsonValue value) {
 	QJsonObject obj = value.toObject();
-#define JSON_OBJ obj
 	JSON_GET(name);
 	JSON_GET(gccPath);
 	JSON_GET(gdbPath);
@@ -42,7 +39,6 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	JSON_GET(warning);
 	JSON_GET(werror);
 	JSON_GET(debug);
-#undef JSON_OBJ
 }
 
 void CompileConfigure::start(QProcess& proc, const QString& src) {

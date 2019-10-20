@@ -3,14 +3,38 @@
 
 #define JSON_SET(key) \
 	do { \
-		JSON_OBJ.insert(#key, QJsonValue(key)); \
+		obj.insert(#key, QJsonValue(key)); \
 	} while (false)
 
 #define JSON_GET(key) \
 	do { \
-		if (JSON_OBJ.contains(#key)) { \
-			key = JSON_OBJ[#key].toVariant().value<decltype(key)>(); \
+		if (obj.contains(#key)) { \
+			key = obj[#key].toVariant().value<decltype(key)>(); \
 		} \
+	} while (false)
+
+#define BIND_CONFIG_BOOL(key) \
+	do { \
+		connect(ui->key, &QCheckBox::toggled, [&](bool c) { \
+			config.key = c; \
+		}); \
+		ui->key->setChecked(config.key); \
+	} while (false)
+
+#define BIND_CONFIG_ENUM(key) \
+	do { \
+		connect(ui->key, QOverload<int>::of(&QComboBox::currentIndexChanged), [&](int i) { \
+			config.key = i; \
+		}); \
+		ui->key->setCurrentIndex(config.key); \
+	} while (false)
+
+#define BIND_CONFIG_INT(key, type) \
+	do { \
+		connect(ui->key, QOverload<int>::of(&type::valueChanged), [&](int i) { \
+			config.key = i; \
+		}); \
+		ui->key->setValue(config.key); \
 	} while (false)
 
 #endif // CONFIGHELP_H

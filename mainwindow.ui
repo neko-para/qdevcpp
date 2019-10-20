@@ -106,17 +106,15 @@
      <string>关于</string>
     </property>
     <addaction name="actionAboutQDevCpp"/>
-    <addaction name="actionAboutDevCpp"/>
     <addaction name="actionAboutQt"/>
-    <addaction name="actionAboutGCC"/>
    </widget>
    <widget class="QMenu" name="menu_2">
     <property name="title">
      <string>工具</string>
     </property>
     <addaction name="actionCompileConfig"/>
-    <addaction name="action"/>
-    <addaction name="action_2"/>
+    <addaction name="actionEnvironmentConfig"/>
+    <addaction name="actionEditorConfig"/>
    </widget>
    <addaction name="menuFile"/>
    <addaction name="menuEdit"/>
@@ -531,12 +529,15 @@
     <string>Ctrl+H</string>
    </property>
   </action>
-  <action name="action">
+  <action name="actionEnvironmentConfig">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>环境选项</string>
    </property>
   </action>
-  <action name="action_2">
+  <action name="actionEditorConfig">
    <property name="text">
     <string>编辑器选项</string>
    </property>

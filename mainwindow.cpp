@@ -6,10 +6,12 @@
 #include <QClipboard>
 #include "global.h"
 #include "compileconfig.h"
+#include "editorconfig.h"
 #include "findreplace.h"
 #include "subprocess.h"
 #include "aboutqdevcpp.h"
 
+static EditorConfigure editorConfig;
 static QList<CompileConfigure> compileConfig;
 static int currentConfigIdx = -1;
 static QClipboard* clipboard = nullptr;
@@ -24,6 +26,8 @@ QsciScintilla* createEditor(QWidget* parent) {
 	editor->setMarginWidth(0, "000000");
 	editor->setMarginLineNumbers(0, true);
 	editor->installEventFilter(window);
+	editor->setWhitespaceVisibility(QsciScintilla::WsVisibleAfterIndent);
+	editor->setAutoIndent(true);
 	return editor;
 }
 
@@ -56,6 +60,7 @@ void loadConfig() {
 	file.close();
 	QJsonObject obj = doc.object();
 	loadMultiConfig(compileConfig, obj["CompileConfig"].toArray());
+	editorConfig.fromJson(obj["EditorConfig"]);
 	findConfig.fromJson(obj["FindConfig"]);
 	if (compileConfig.size()) {
 		currentConfigIdx = obj["CurrentCompileConfig"].toInt();
@@ -74,9 +79,10 @@ void saveConfig() {
 	QJsonObject obj;
 	obj.insert("CompileConfig", saveMultiConfig(compileConfig));
 	obj.insert("CurrentCompileConfig", currentConfigIdx);
+	obj.insert("EditorConfig", editorConfig.toJson());
 	obj.insert("FindConfig", findConfig.toJson());
 	QJsonDocument doc(obj);
-	file.write(doc.toJson());
+	file.write(doc.toJson(QJsonDocument::Compact));
 	file.close();
 }
 
@@ -217,6 +223,13 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 				currentConfig = nullptr;
 			}
 			updateCompileActions();
+		}
+	});
+	connect(ui->actionEditorConfig, &QAction::triggered, [&]() {
+		EditorConfig dlg(editorConfig, this);
+		if (QDialog::Accepted == dlg.exec()) {
+			editorConfig = dlg.configure();
+			// TODO: update editor configure
 		}
 	});
 	connect(ui->actionAboutQDevCpp, &QAction::triggered, [&]() {

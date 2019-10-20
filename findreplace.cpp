@@ -6,41 +6,30 @@
 
 QJsonValue FindReplaceConfig::toJson() const {
 	QJsonObject obj;
-#define JSON_OBJ obj
 	JSON_SET(useRegex);
 	JSON_SET(caseInsensitive);
 	JSON_SET(matchWord);
 	JSON_SET(findBackward);
 	JSON_SET(wrap);
-#undef JSON_OBJ
 	return obj;
 }
 
 void FindReplaceConfig::fromJson(QJsonValue value) {
 	QJsonObject obj = value.toObject();
-#define JSON_OBJ obj
 	JSON_GET(useRegex);
 	JSON_GET(caseInsensitive);
 	JSON_GET(matchWord);
 	JSON_GET(findBackward);
 	JSON_GET(wrap);
-#undef JSON_OBJ
 }
 
 FindReplace::FindReplace(FindReplaceConfig& cfg, QWidget *parent) : QDialog(parent), ui(new Ui::FindReplace), config(cfg) {
 	ui->setupUi(this);
-#define BIND_CONFIG(key) \
-	do { \
-		ui->key->setChecked(config.key); \
-		connect(ui->key, &QCheckBox::toggled, [&](bool c) { \
-			config.key = c; \
-		}); \
-	} while (false)
-	BIND_CONFIG(useRegex);
-	BIND_CONFIG(caseInsensitive);
-	BIND_CONFIG(matchWord);
-	BIND_CONFIG(findBackward);
-	BIND_CONFIG(wrap);
+	BIND_CONFIG_BOOL(useRegex);
+	BIND_CONFIG_BOOL(caseInsensitive);
+	BIND_CONFIG_BOOL(matchWord);
+	BIND_CONFIG_BOOL(findBackward);
+	BIND_CONFIG_BOOL(wrap);
 	connect(ui->find, &QPushButton::clicked, [&]() {
 		if (config.findBackward && ei->editor->selectedText().length()) {
 			QApplication::sendEvent(ei->editor, new QKeyEvent(QEvent::KeyPress, Qt::Key_Left, Qt::NoModifier));

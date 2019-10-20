@@ -31,7 +31,8 @@ SOURCES += \
     subprocess.cpp \
     editorinfo.cpp \
     aboutqdevcpp.cpp \
-    findreplace.cpp
+    findreplace.cpp \
+    editorconfig.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -42,10 +43,12 @@ HEADERS += \
     aboutqdevcpp.h \
     findreplace.h \
     config.h \
-    confighelp.h
+    confighelp.h \
+    editorconfig.h
 
 FORMS += \
         mainwindow.ui \
     compileconfig.ui \
     aboutqdevcpp.ui \
-    findreplace.ui
+    findreplace.ui \
+    editorconfig.ui
