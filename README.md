@@ -15,6 +15,7 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 * [ ] 制作release
 * [ ] branch master
 	* [ ] 完成状态栏
+	* [ ] 实现拖拽文件
 * [ ] branch color
 	* [ ] 自定义配色
 * [ ] branch edit
