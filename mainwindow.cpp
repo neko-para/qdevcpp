@@ -23,11 +23,7 @@ CompileConfigure* currentConfig;
 QsciScintilla* createEditor(QWidget* parent) {
 	QsciScintilla* editor = new QsciScintilla(parent);
 	editor->setTabWidth(4);
-	editor->setMarginWidth(0, "000000");
-	editor->setMarginLineNumbers(0, true);
 	editor->installEventFilter(window);
-	editor->setWhitespaceVisibility(QsciScintilla::WsVisibleAfterIndent);
-	editor->setAutoIndent(true);
 	return editor;
 }
 
@@ -93,7 +89,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	ui->dockDebug->setVisible(false);
 	ui->actionDebug->setEnabled(false);
 	ui->actionDebugToolDock->setEnabled(false);
-
 	ui->compileResult->horizontalHeader()->setStretchLastSection(true);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(0, QHeaderView::ResizeToContents);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
@@ -118,6 +113,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionPaste, &QAction::triggered, [&]() {
 		currentEditor()->paste();
 	});
+	connect(ui->actionSelectAll, &QAction::triggered, [&]() {
+		currentEditor()->selectAll();
+	});
 	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
 	connect(ui->actionNew, &QAction::triggered, [&]() {
 		QsciScintilla* e = createEditor(ui->SrcTab);
@@ -125,6 +123,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		ei = new EditorInfo(e, ui);
 		ui->SrcTab->addTab(e, ei->generateTitle());
 		ui->SrcTab->setCurrentWidget(e);
+		ei->updateEditorConfig(editorConfig);
 	});
 	connect(ui->actionOpen, &QAction::triggered, [&]() {
 		QStringList paths = QFileDialog::getOpenFileNames(this, "qdevcpp - 打开", "", "所有支持类型 (*.c *.cpp *.cc *.cxx *.h *.hpp);;所有文件 (*.*)");
@@ -143,6 +142,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 				if (ei->open(p)) {
 					ui->SrcTab->addTab(e, ei->generateTitle());
 					ui->SrcTab->setCurrentWidget(e);
+					ei->updateEditorConfig(editorConfig);
 				} else {
 					ei->deleteLater();
 				}
@@ -229,7 +229,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		EditorConfig dlg(editorConfig, this);
 		if (QDialog::Accepted == dlg.exec()) {
 			editorConfig = dlg.configure();
-			// TODO: update editor configure
+			for (auto ei : info.values()) {
+				ei->updateEditorConfig(editorConfig);
+			}
 		}
 	});
 	connect(ui->actionAboutQDevCpp, &QAction::triggered, [&]() {
@@ -308,12 +310,14 @@ void MainWindow::updateTab(int idx) {
 		ui->actionRedo->setEnabled(false);
 		ui->actionCopy->setEnabled(false);
 		ui->actionCut->setEnabled(false);
+		ui->actionSelectAll->setEnabled(false);
 		finddlg->setEditorInfo(nullptr);
 	} else {
 		ui->actionSave->setEnabled(true);
 		ui->actionSaveAs->setEnabled(true);
 		ui->actionClose->setEnabled(true);
 		ui->actionCloseAll->setEnabled(true);
+		ui->actionSelectAll->setEnabled(true);
 		EditorInfo* ei = info[currentEditor()];
 		ei->updateUndoRedoState();
 		ei->updateCopyCutState();
@@ -356,4 +360,15 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 		}
 	}
 	return QMainWindow::eventFilter(watched, event);
+}
+
+void MainWindow::closeEvent(QCloseEvent* e) {
+	while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+		;
+	}
+	if (ui->SrcTab->count()) {
+		e->ignore();
+	} else {
+		e->accept();
+	}
 }

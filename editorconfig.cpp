@@ -2,6 +2,7 @@
 #include "ui_editorconfig.h"
 #include "confighelp.h"
 #include <QJsonObject>
+#include <QColorDialog>
 #include <QDebug>
 
 QJsonValue EditorConfigure::toJson() const {
@@ -14,6 +15,7 @@ QJsonValue EditorConfigure::toJson() const {
 	JSON_SET(saveInterval);
 	JSON_SET(showLineNumber);
 	JSON_SET(highlightCurrent);
+	obj.insert("currentColor", QJsonValue(currentColor.name(QColor::HexArgb)));
 	JSON_SET(font);
 	JSON_SET(fontSize);
 	return obj;
@@ -29,6 +31,9 @@ void EditorConfigure::fromJson(QJsonValue value) {
 	JSON_GET(saveInterval);
 	JSON_GET(showLineNumber);
 	JSON_GET(highlightCurrent);
+	if (obj.contains("currentColor")) {
+		currentColor.setNamedColor(obj["currentColor"].toVariant().value<QString>());
+	}
 	JSON_GET(font);
 	JSON_GET(fontSize);
 }
@@ -43,11 +48,19 @@ EditorConfig::EditorConfig(const EditorConfigure& cfg, QWidget *parent) : QDialo
 	BIND_CONFIG_INT(saveInterval, QSlider);
 	BIND_CONFIG_BOOL(showLineNumber);
 	BIND_CONFIG_BOOL(highlightCurrent);
-	BIND_CONFIG_INT(fontSize, QSpinBox);
+	connect(ui->browseCurrentColor, &QToolButton::clicked, [&]() {
+		QColor c = QColorDialog::getColor(config.currentColor, this, "qdevcpp - 选取当前行颜色");
+		if (c.isValid()) {
+			config.currentColor = c;
+			ui->currentColor->setStyleSheet(QString("#currentColor { background: %1 }").arg(config.currentColor.name(QColor::HexArgb)));
+		}
+	});
+	ui->currentColor->setStyleSheet(QString("#currentColor { background: %1 }").arg(config.currentColor.name(QColor::HexArgb)));
 	connect(ui->font, &QFontComboBox::currentFontChanged, [&](QFont f) {
 		config.font = f.family();
 	});
 	ui->font->setCurrentFont(QFont(config.font));
+	BIND_CONFIG_INT(fontSize, QSpinBox);
 	connect(ui->ok, &QPushButton::clicked, this, &EditorConfig::accept);
 	connect(ui->cancel, &QPushButton::clicked, this, &EditorConfig::reject);
 }

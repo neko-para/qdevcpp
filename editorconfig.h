@@ -22,10 +22,11 @@ struct EditorConfigure : public Config {
 	int saveInterval = 5;
 	bool showLineNumber = true;
 	bool highlightCurrent = true;
+	QColor currentColor; // "#FFCCFFFF
 	QString font; // "Consolas"
 	int fontSize = 20;
 
-	EditorConfigure() : font("Consolas") {}
+	EditorConfigure() : currentColor(0xCC, 0xFF, 0xFF), font("Consolas") {}
 	virtual QJsonValue toJson() const;
 	virtual void fromJson(QJsonValue value);
 };

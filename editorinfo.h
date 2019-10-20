@@ -4,6 +4,7 @@
 #include <QDateTime>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
+#include "editorconfig.h"
 
 namespace Ui {
 	class MainWindow;
@@ -48,6 +49,7 @@ public:
 	QString generateTitle() const {
 		return generateName() + (isAtSavePoint() ? "" : " *");
 	}
+	void updateEditorConfig(const EditorConfigure& cfg);
 	bool open(const QString& cpath);
 	bool write(const QString& cpath);
 	bool saveas();

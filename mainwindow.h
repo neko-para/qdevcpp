@@ -41,6 +41,7 @@ public slots:
 
 protected:
 	virtual bool eventFilter(QObject *watched, QEvent *event);
+	virtual void closeEvent(QCloseEvent* e);
 
 private:
 	Ui::MainWindow *ui;

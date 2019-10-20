@@ -90,6 +90,34 @@ QString EditorInfo::generateName() const {
 	}
 }
 
+void EditorInfo::updateEditorConfig(const EditorConfigure& cfg) {
+	editor->setAutoIndent(cfg.autoIndent);
+	editor->setWhitespaceVisibility((QsciScintilla::WhitespaceVisibility)cfg.showWhiteSpace);
+	if (cfg.enableRightMargin) {
+		editor->setEdgeMode(QsciScintilla::EdgeLine);
+		editor->setEdgeColumn(cfg.marginWidth);
+	} else {
+		editor->setEdgeMode(QsciScintilla::EdgeNone);
+	}
+	if (cfg.showLineNumber) {
+		editor->setMargins(2);
+		editor->setMarginWidth(1, "000000");
+		editor->setMarginLineNumbers(1, true);
+	} else {
+		editor->setMargins(1);
+	}
+	editor->setCaretLineVisible(cfg.highlightCurrent);
+	if (cfg.highlightCurrent) {
+		editor->setCaretLineBackgroundColor(cfg.currentColor);
+	}
+	QFont font(cfg.font, cfg.fontSize);
+	if (editor->lexer()) {
+		editor->lexer()->setFont(font);
+	} else {
+		editor->setFont(font);
+	}
+}
+
 bool EditorInfo::open(const QString& cpath)  {
 	QFile file(cpath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
