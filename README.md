@@ -11,10 +11,20 @@
 This is not a generic IDE. If you want to learn the c/c++ programing language, don't use it.
 
 ## TODOs
-[ ] 制作release
-[ ] 调试
-[ ] 自定义配色
-[ ] 快捷注释(翻转注释)
-[ ] 额外的编辑功能(复制,删除,移动行)
-[ ] 环境选项(自动关联)
-[ ] 完成状态栏
+
+* [ ] 制作release
+* [ ] branch master
+	* [ ] 完成状态栏
+* [ ] branch color
+	* [ ] 自定义配色
+* [ ] branch edit
+	* [ ] 快捷注释
+		* [ ] 翻转注释
+	* [ ] 额外的编辑功能
+		* [ ] 复制,删除行
+		* [ ] 移动行
+* [ ] branch debug
+	* [ ] 调试
+* [ ] branch system
+	* [ ] 环境选项
+		* [ ] 文件关联
