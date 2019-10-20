@@ -78,6 +78,16 @@
     <addaction name="actionPaste"/>
     <addaction name="actionSelectAll"/>
     <addaction name="separator"/>
+    <addaction name="actionToggleComment"/>
+    <addaction name="separator"/>
+    <addaction name="actionCopyRow"/>
+    <addaction name="actionDelRow"/>
+    <addaction name="separator"/>
+    <addaction name="actionMoveRowUp"/>
+    <addaction name="actionMoveRowDown"/>
+    <addaction name="separator"/>
+    <addaction name="actionIndent"/>
+    <addaction name="actionUnindent"/>
    </widget>
    <widget class="QMenu" name="menuSearch">
     <property name="title">
@@ -554,6 +564,62 @@
    </property>
    <property name="shortcut">
     <string>Ctrl+A</string>
+   </property>
+  </action>
+  <action name="actionToggleComment">
+   <property name="text">
+    <string>设置注释</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+/</string>
+   </property>
+  </action>
+  <action name="actionCopyRow">
+   <property name="text">
+    <string>复制行</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+E</string>
+   </property>
+  </action>
+  <action name="actionDelRow">
+   <property name="text">
+    <string>删除行</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+D</string>
+   </property>
+  </action>
+  <action name="actionMoveRowUp">
+   <property name="text">
+    <string>上移选择行</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Up</string>
+   </property>
+  </action>
+  <action name="actionMoveRowDown">
+   <property name="text">
+    <string>下移选择行</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+Shift+Down</string>
+   </property>
+  </action>
+  <action name="actionIndent">
+   <property name="text">
+    <string>缩进</string>
+   </property>
+   <property name="shortcut">
+    <string>Tab</string>
+   </property>
+  </action>
+  <action name="actionUnindent">
+   <property name="text">
+    <string>取消缩进</string>
+   </property>
+   <property name="shortcut">
+    <string>Shift+Tab</string>
    </property>
   </action>
  </widget>
