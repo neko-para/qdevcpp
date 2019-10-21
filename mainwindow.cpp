@@ -124,6 +124,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		e->beginUndoAction();
 		e->setSelection(l, 0, l, e->lineLength(l));
 		QString d = e->selectedText();
+		if (l + 1 == e->lines()) {
+			d += "\n";
+		}
 		e->insertAt(d, l, 0);
 		e->setCursorPosition(l, i);
 		e->endUndoAction();
