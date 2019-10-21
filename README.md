@@ -46,8 +46,11 @@ sudo apt install libqscintilla2-qt5-dev
 * [ ] branch color
 	* [ ] 自定义配色
 * [ ] branch edit
-	* [ ] 行编辑
-		* [ ] 复制,删除行
+	* [x] 对齐
+	* [ ] 快捷注释
+		* [ ] 翻转注释
+	* [ ] 额外的编辑功能
+		* [x] 复制,删除行
 		* [ ] 移动行
 	* [ ] 快捷注释
 		* [ ] 翻转注释
