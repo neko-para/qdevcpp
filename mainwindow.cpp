@@ -10,6 +10,7 @@
 #include "findreplace.h"
 #include "subprocess.h"
 #include "aboutqdevcpp.h"
+#include <QDebug>
 
 static EditorConfigure editorConfig;
 static QList<CompileConfigure> compileConfig;
@@ -116,6 +117,34 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionSelectAll, &QAction::triggered, [&]() {
 		currentEditor()->selectAll();
 	});
+	connect(ui->actionCopyRow, &QAction::triggered, [&]() {
+		auto e = currentEditor();
+		int l, i;
+		e->getCursorPosition(&l, &i);
+		e->beginUndoAction();
+		e->setSelection(l, 0, l, e->lineLength(l));
+		QString d = e->selectedText();
+		e->insertAt(d, l, 0);
+		e->setCursorPosition(l, i);
+		e->endUndoAction();
+	});
+	connect(ui->actionDelRow, &QAction::triggered, [&]() {
+		auto e = currentEditor();
+		int l, i;
+		e->getCursorPosition(&l, &i);
+		e->beginUndoAction();
+		if (l + 1 == e->lines()) {
+			if (l) {
+				e->setSelection(l - 1, e->lineLength(l - 1) - 1, l, e->lineLength(l));
+			} else {
+				e->setSelection(0, 0, 0, e->lineLength(0));
+			}
+		} else {
+			e->setSelection(l, 0, l + 1, 0);
+		}
+		e->removeSelectedText();
+		e->endUndoAction();
+	});
 	connect(ui->actionIndent, &QAction::triggered, [&]() {
 		int sl, si, el, ei;
 		auto e = currentEditor();
@@ -125,7 +154,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			si = 0;
 			if (ei) {
 				if (e->lines() == el + 1) {
-					ei = e->lineLength(el) + 1;
+					ei = e->lineLength(el);
 				} else {
 					++el;
 					ei = 0;
@@ -147,7 +176,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			si = 0;
 			if (ei) {
 				if (e->lines() == el + 1) {
-					ei = e->lineLength(el) + 1;
+					ei = e->lineLength(el);
 				} else {
 					++el;
 					ei = 0;
@@ -397,10 +426,19 @@ void MainWindow::updateWindowTitle() {
 
 bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 	QsciScintilla* e = dynamic_cast<QsciScintilla*>(watched);
-	if (event->type() == QEvent::FocusIn && e) {
-		auto ei = info[e];
-		if (ei->isModifiedByOthers()) {
-			ei->reload();
+	if (e) {
+		if (event->type() == QEvent::FocusIn) {
+			auto ei = info[e];
+			if (ei->isModifiedByOthers()) {
+				ei->reload();
+			}
+		} else if (event->type() == QEvent::KeyPress) {
+			QKeyEvent* ke = dynamic_cast<QKeyEvent*>(event);
+			if (ke->key() == Qt::Key_D && ke->modifiers() == Qt::ControlModifier) {
+				ui->actionDelRow->trigger();
+				ke->accept();
+				return true;
+			}
 		}
 	}
 	return QMainWindow::eventFilter(watched, event);

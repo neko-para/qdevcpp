@@ -22,7 +22,7 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 	* [ ] 快捷注释
 		* [ ] 翻转注释
 	* [ ] 额外的编辑功能
-		* [ ] 复制,删除行
+		* [x] 复制,删除行
 		* [ ] 移动行
 * [ ] branch debug
 	* [ ] 调试
