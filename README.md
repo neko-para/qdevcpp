@@ -12,7 +12,16 @@
 
 This is not a generic IDE. If you want to learn the c/c++ programing language, don't use it.
 
-## 构建
+## Release
+
+### Windows
+
+#### Mingw
+
+<!-- [64位]() -->
+<!-- [32位]() -->
+
+## Build
 
 使用Qt5和QScintilla2
 

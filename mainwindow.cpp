@@ -529,7 +529,7 @@ void MainWindow::updateTab(int idx) {
 void MainWindow::updateCompileActions() {
 	bool enabled = currentEditor();
 	ui->actionRun->setEnabled(enabled);
-	ui->actionClean->setEnabled(enabled);
+//	ui->actionClean->setEnabled(enabled);
 	enabled = enabled && (currentConfigIdx != -1);
 	ui->actionCompile->setEnabled(enabled);
 	ui->actionCompileRun->setEnabled(enabled);
