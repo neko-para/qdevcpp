@@ -117,6 +117,74 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	clipboard = QApplication::clipboard();
 	finddlg = new FindReplace(findConfig, this);
 	connect(clipboard, &QClipboard::changed, this, &MainWindow::updatePasteAction);
+	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
+	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {
+		closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(idx)));
+	});
+	connect(ui->actionNew, &QAction::triggered, [&]() {
+		QsciScintilla* e = createEditor(ui->SrcTab);
+		auto& ei = info[e];
+		ei = new EditorInfo(e, ui);
+		ei->updateEditorConfig(editorConfig);
+		ui->SrcTab->addTab(e, ei->generateTitle());
+		ui->SrcTab->setCurrentWidget(e);
+		e->setFocus();
+	});
+	connect(ui->actionOpen, &QAction::triggered, [&]() {
+		QStringList paths = QFileDialog::getOpenFileNames(this, "qdevcpp - 打开", "", "所有支持类型 (*.c *.cpp *.cc *.cxx *.h *.hpp);;所有文件 (*.*)");
+		if (!paths.size()) {
+			return;
+		}
+		for (const auto& p : paths) {
+			auto pei = findTab(p);
+			if (pei) {
+				ui->SrcTab->setCurrentWidget(pei->editor);
+				pei->editor->setFocus();
+			} else {
+				QsciScintilla* e = createEditor(ui->SrcTab);
+				auto& ei = info[e];
+				ei = new EditorInfo(e, ui);
+				if (ei->open(p)) {
+					ei->updateEditorConfig(editorConfig);
+					ui->SrcTab->addTab(e, ei->generateTitle());
+					ui->SrcTab->setCurrentWidget(e);
+					e->setFocus();
+				} else {
+					ei->deleteLater();
+				}
+			}
+		}
+	});
+	connect(ui->actionSave, &QAction::triggered, [&]() {
+		auto ei = info[currentEditor()];
+		if (!ei->save()) {
+			return;
+		}
+		removeOther(ei);
+	});
+	connect(ui->actionSaveAs, &QAction::triggered, [&]() {
+		auto ei = info[currentEditor()];
+		if (!ei->saveas()) {
+			return;
+		}
+		removeOther(ei);
+	});
+	connect(ui->actionClose, &QAction::triggered, [&]() {
+		closeTab(currentEditor());
+	});
+	connect(ui->actionCloseAll, &QAction::triggered, [&]() {
+		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+			;
+		}
+	});
+	connect(ui->actionExit, &QAction::triggered, [&]() {
+		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+			;
+		}
+		if (!ui->SrcTab->count()) {
+			close();
+		}
+	});
 	connect(ui->actionUndo, &QAction::triggered, [&]() {
 		currentEditor()->undo();
 	});
@@ -134,6 +202,25 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	});
 	connect(ui->actionSelectAll, &QAction::triggered, [&]() {
 		currentEditor()->selectAll();
+	});
+	connect(ui->actionToggleComment, &QAction::triggered, [&]() {
+		auto e = currentEditor();
+		int l, i;
+		e->getCursorPosition(&l, &i);
+		e->beginUndoAction();
+		e->setSelection(l, 0, l, e->lineLength(l));
+		if (e->selectedText().startsWith("//")) {
+			e->setSelection(l, 0, l, 2);
+			e->removeSelectedText();
+			i = std::max(0, i - 2);
+		} else {
+			e->selectAll(false);
+			e->setCursorPosition(l, 0);
+			e->insert("//");
+			i += 2;
+		}
+		e->setCursorPosition(l, i);
+		e->endUndoAction();
 	});
 	connect(ui->actionCopyRow, &QAction::triggered, [&]() {
 		auto e = currentEditor();
@@ -210,76 +297,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			e->setSelection(sl, 0, el, ei);
 		}
 	});
-	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
-	connect(ui->actionNew, &QAction::triggered, [&]() {
-		QsciScintilla* e = createEditor(ui->SrcTab);
-		auto& ei = info[e];
-		ei = new EditorInfo(e, ui);
-		ei->updateEditorConfig(editorConfig);
-		ui->SrcTab->addTab(e, ei->generateTitle());
-		ui->SrcTab->setCurrentWidget(e);
-		e->setFocus();
-	});
-	connect(ui->actionOpen, &QAction::triggered, [&]() {
-		QStringList paths = QFileDialog::getOpenFileNames(this, "qdevcpp - 打开", "", "所有支持类型 (*.c *.cpp *.cc *.cxx *.h *.hpp);;所有文件 (*.*)");
-		if (!paths.size()) {
-			return;
-		}
-		for (const auto& p : paths) {
-			auto pei = findTab(p);
-			if (pei) {
-				ui->SrcTab->setCurrentWidget(pei->editor);
-				pei->editor->setFocus();
-			} else {
-				QsciScintilla* e = createEditor(ui->SrcTab);
-				auto& ei = info[e];
-				ei = new EditorInfo(e, ui);
-				if (ei->open(p)) {
-					ei->updateEditorConfig(editorConfig);
-					ui->SrcTab->addTab(e, ei->generateTitle());
-					ui->SrcTab->setCurrentWidget(e);
-					e->setFocus();
-				} else {
-					ei->deleteLater();
-				}
-			}
-		}
-	});
-	connect(ui->actionSave, &QAction::triggered, [&]() {
-		auto ei = info[currentEditor()];
-		if (!ei->save()) {
-			return;
-		}
-		removeOther(ei);
-	});
-	connect(ui->actionSaveAs, &QAction::triggered, [&]() {
-		auto ei = info[currentEditor()];
-		if (!ei->saveas()) {
-			return;
-		}
-		removeOther(ei);
-	});
-	connect(ui->actionClose, &QAction::triggered, [&]() {
-		closeTab(currentEditor());
-	});
-	connect(ui->actionCloseAll, &QAction::triggered, [&]() {
-		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
-			;
-		}
-	});
-	connect(ui->actionExit, &QAction::triggered, [&]() {
-		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
-			;
-		}
-		if (!ui->SrcTab->count()) {
-			close();
-		}
-	});
 	connect(ui->actionFindReplace, &QAction::triggered, [&]() {
 		finddlg->show();
-	});
-	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {
-		closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(idx)));
 	});
 	connect(ui->dockInfo, &QDockWidget::visibilityChanged, ui->actionCompileInfoDock, &QAction::setChecked);
 	connect(ui->actionCompileInfoDock, &QAction::toggled, ui->dockInfo, &QDockWidget::setVisible);
@@ -487,10 +506,17 @@ bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
 			}
 		} else if (event->type() == QEvent::KeyPress) {
 			QKeyEvent* ke = dynamic_cast<QKeyEvent*>(event);
-			if (ke->key() == Qt::Key_D && ke->modifiers() == Qt::ControlModifier) {
-				ui->actionDelRow->trigger();
-				ke->accept();
-				return true;
+			if (ke->modifiers() == Qt::ControlModifier) {
+				switch (ke->key()) {
+				case Qt::Key_D:
+					ui->actionDelRow->trigger();
+					ke->accept();
+					return true;
+				case Qt::Key_Slash:
+					ui->actionToggleComment->trigger();
+					ke->accept();
+					return true;
+				}
 			}
 		}
 	}
