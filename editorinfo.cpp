@@ -33,6 +33,21 @@ void EditorInfo::updateSelectionState() {
 	ui->actionUnindent->setEnabled(e);
 }
 
+void EditorInfo::updateStatusInfo() {
+	int l, i;
+	editor->getCursorPosition(&l, &i);
+	window->status[MainWindow::ST_ROW]->setText(QString("行:%1").arg(l + 1));
+	window->status[MainWindow::ST_COL]->setText(QString("列:%1").arg(i + 1));
+	window->status[MainWindow::ST_AR]->setText(QString("总行:%1").arg(editor->lines()));
+	window->status[MainWindow::ST_AL]->setText(QString("总长:%1").arg(editor->text().length()));
+	int sl = editor->selectedText().length();
+	if (sl) {
+		window->status[MainWindow::ST_S]->setText(QString("选择:%1").arg(sl));
+	} else {
+		window->status[MainWindow::ST_S]->setText("");
+	}
+}
+
 QsciLexerCPP* createLexer() {
 	QsciLexerCPP* lexer = new QsciLexerCPP;
 	lexer->setFont(QFont("ubuntu mono"));
@@ -43,6 +58,9 @@ EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow* ui) : editor(e), ui(ui)
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateSelectionState);
+	connect(e, &QsciScintilla::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(this, &EditorInfo::pathChange, [&](QString) {
 		if (shallSyntaxHighlight()) {
 			if (!editor->lexer()) {
@@ -125,7 +143,7 @@ void EditorInfo::updateEditorConfig(const EditorConfigure& cfg) {
 bool EditorInfo::open(const QString& cpath)  {
 	QFile file(cpath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));;
+		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));;
 		return false;
 	}
 	qint64 length = file.size();
@@ -144,7 +162,7 @@ bool EditorInfo::open(const QString& cpath)  {
 	} else {
 		file.close();
 		delete[] buffer;
-		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
 		return false;
 	}
 }
@@ -153,7 +171,7 @@ bool EditorInfo::write(const QString& cpath)  {
 	auto buffer = editor->text().toUtf8();
 	QFile file(cpath);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate | QIODevice::Text)) {
-		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
 		return false;
 	}
 	if (buffer.size() == file.write(buffer)) {
@@ -168,7 +186,7 @@ bool EditorInfo::write(const QString& cpath)  {
 		return true;
 	} else {
 		file.close();
-		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName(), file.errorString()));
+		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
 		return false;
 	}
 }

@@ -2,13 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QMap>
-#include <QList>
-#include <QFileInfo>
-#include <QMessageBox>
-#include <QFileDialog>
-#include <QPlainTextEdit>
-#include <QTableWidget>
+#include <QLabel>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 #include "editorinfo.h"
@@ -47,6 +41,15 @@ private:
 	Ui::MainWindow *ui;
 	QMap<QsciScintilla*, EditorInfo*> info;
 	FindReplace* finddlg = nullptr;
+	enum StatusType {
+		ST_ROW,
+		ST_COL,
+		ST_AR,
+		ST_AL,
+		ST_S,
+		ST_COUNT
+	};
+	QLabel* status[ST_COUNT];
 };
 
 #endif // MAINWINDOW_H

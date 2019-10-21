@@ -4,13 +4,14 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QFileInfo>
 #include "global.h"
 #include "compileconfig.h"
 #include "editorconfig.h"
 #include "findreplace.h"
 #include "subprocess.h"
 #include "aboutqdevcpp.h"
-#include <QDebug>
 
 static EditorConfigure editorConfig;
 static QList<CompileConfigure> compileConfig;
@@ -86,6 +87,11 @@ void saveConfig() {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
 	::window = this;
 	ui->setupUi(this);
+	for (int i = 0; i < ST_COUNT; ++i) {
+		auto& l = status[i];
+		l = new QLabel(ui->statusBar);
+		ui->statusBar->addWidget(l, 1);
+	}
 	// Disable Debug
 	ui->dockDebug->setVisible(false);
 	ui->actionDebug->setEnabled(false);
@@ -265,7 +271,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionCompileInfoDock, &QAction::toggled, ui->dockInfo, &QDockWidget::setVisible);
 	connect(ui->dockDebug, &QDockWidget::visibilityChanged, ui->actionDebugToolDock, &QAction::setChecked);
 	connect(ui->actionDebugToolDock, &QAction::toggled, ui->dockDebug, &QDockWidget::setVisible);
-	connect(ui->actionStatusBar, &QAction::toggled, ui->StatusBar, &QStatusBar::setVisible);
+	connect(ui->actionStatusBar, &QAction::toggled, ui->statusBar, &QStatusBar::setVisible);
 	connect(ui->actionCompile, &QAction::triggered, [&]() {
 		auto ei = info[currentEditor()];
 		if (!ei->save()) {
@@ -400,7 +406,9 @@ void MainWindow::updateTab(int idx) {
 						 ui->actionIndent,
 						 ui->actionUnindent,
 					 });
-
+		for (auto l : status) {
+			l->setVisible(false);
+		}
 		finddlg->setEditorInfo(nullptr);
 	} else {
 		::setEnabled(true, {
@@ -417,6 +425,10 @@ void MainWindow::updateTab(int idx) {
 		ei->updateUndoRedoState();
 		ei->updateSelectionState();
 		finddlg->setEditorInfo(ei);
+		for (auto l : status) {
+			l->setVisible(true);
+		}
+		ei->updateStatusInfo();
 	}
 	updateCompileActions();
 	updatePasteAction();
