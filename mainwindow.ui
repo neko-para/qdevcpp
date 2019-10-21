@@ -575,6 +575,9 @@
    </property>
   </action>
   <action name="actionCopyRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>复制行</string>
    </property>
@@ -583,6 +586,9 @@
    </property>
   </action>
   <action name="actionDelRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>删除行</string>
    </property>
@@ -607,6 +613,9 @@
    </property>
   </action>
   <action name="actionIndent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>缩进</string>
    </property>
@@ -615,6 +624,9 @@
    </property>
   </action>
   <action name="actionUnindent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>取消缩进</string>
    </property>

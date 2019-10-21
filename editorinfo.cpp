@@ -23,10 +23,14 @@ void EditorInfo::updateUndoRedoState() {
 	ui->actionRedo->setEnabled(editor->isRedoAvailable());
 }
 
-void EditorInfo::updateCopyCutState() {
-	bool e = editor->selectedText().length();
+void EditorInfo::updateSelectionState() {
+	int sl, si, el, ei;
+	editor->getSelection(&sl, &si, &el, &ei);
+	bool e = (sl != -1);
 	ui->actionCopy->setEnabled(e);
 	ui->actionCut->setEnabled(e);
+	ui->actionIndent->setEnabled(e);
+	ui->actionUnindent->setEnabled(e);
 }
 
 QsciLexerCPP* createLexer() {
@@ -38,7 +42,7 @@ QsciLexerCPP* createLexer() {
 EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
 	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
-	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateCopyCutState);
+	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateSelectionState);
 	connect(this, &EditorInfo::pathChange, [&](QString) {
 		if (shallSyntaxHighlight()) {
 			if (!editor->lexer()) {

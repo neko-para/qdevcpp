@@ -373,27 +373,46 @@ void MainWindow::removeOther(EditorInfo* ei) {
 	}
 }
 
+void setEnabled(bool e, QList<QAction*> actions) {
+	for (auto a : actions) {
+		a->setEnabled(e);
+	}
+}
+
 void MainWindow::updateTab(int idx) {
 	if (idx == -1) {
-		ui->actionSave->setEnabled(false);
-		ui->actionSaveAs->setEnabled(false);
-		ui->actionClose->setEnabled(false);
-		ui->actionCloseAll->setEnabled(false);
-		ui->actionUndo->setEnabled(false);
-		ui->actionRedo->setEnabled(false);
-		ui->actionCopy->setEnabled(false);
-		ui->actionCut->setEnabled(false);
-		ui->actionSelectAll->setEnabled(false);
+		::setEnabled(false, {
+						 ui->actionSave,
+						 ui->actionSaveAs,
+						 ui->actionClose,
+						 ui->actionCloseAll,
+						 ui->actionUndo,
+						 ui->actionRedo,
+						 ui->actionCopy,
+						 ui->actionCut,
+						 ui->actionPaste,
+						 ui->actionSelectAll,
+						 ui->actionCopyRow,
+						 ui->actionDelRow,
+						 ui->actionIndent,
+						 ui->actionUnindent,
+					 });
+
 		finddlg->setEditorInfo(nullptr);
 	} else {
-		ui->actionSave->setEnabled(true);
-		ui->actionSaveAs->setEnabled(true);
-		ui->actionClose->setEnabled(true);
-		ui->actionCloseAll->setEnabled(true);
-		ui->actionSelectAll->setEnabled(true);
+		::setEnabled(true, {
+						 ui->actionSave,
+						 ui->actionSaveAs,
+						 ui->actionClose,
+						 ui->actionCloseAll,
+						 ui->actionPaste,
+						 ui->actionSelectAll,
+						 ui->actionCopyRow,
+						 ui->actionDelRow,
+					 });
 		EditorInfo* ei = info[currentEditor()];
 		ei->updateUndoRedoState();
-		ei->updateCopyCutState();
+		ei->updateSelectionState();
 		finddlg->setEditorInfo(ei);
 	}
 	updateCompileActions();
