@@ -92,6 +92,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		l = new QLabel(ui->statusBar);
 		ui->statusBar->addWidget(l, 1);
 	}
+	autoSave = new QTimer(this);
+	autoSave->setSingleShot(false);
+	connect(autoSave, &QTimer::timeout, [&]() {
+		for (auto ei : info.values()) {
+			if (!ei->isUntitled()) {
+				ei->save();
+			}
+		}
+	});
 	// Disable Debug
 	ui->dockDebug->setVisible(false);
 	ui->actionDebug->setEnabled(false);
@@ -102,6 +111,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
 	ui->compileResult->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
 	loadConfig();
+	if (editorConfig.enableAutoSave) {
+		autoSave->start(editorConfig.saveInterval * 60 * 1000);
+	}
 	clipboard = QApplication::clipboard();
 	finddlg = new FindReplace(findConfig, this);
 	connect(clipboard, &QClipboard::changed, this, &MainWindow::updatePasteAction);
@@ -315,6 +327,11 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			editorConfig = dlg.configure();
 			for (auto ei : info.values()) {
 				ei->updateEditorConfig(editorConfig);
+			}
+			if (editorConfig.enableAutoSave) {
+				autoSave->start(editorConfig.saveInterval * 60 * 1000);
+			} else {
+				autoSave->stop();
 			}
 		}
 	});

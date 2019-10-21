@@ -211,7 +211,7 @@ bool EditorInfo::save() {
 }
 
 bool EditorInfo::askSave()  {
-	if (!isUntitled() && isAtSavePoint()) {
+	if (isAtSavePoint()) {
 		return true;
 	}
 	switch (QMessageBox::question(editor, "qdevcpp", QString("是否保存%1").arg(generateName()), QMessageBox::Yes, QMessageBox::No, QMessageBox::Cancel)) {

@@ -5,6 +5,7 @@
 #include <QLabel>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
+#include <QTimer>
 #include "editorinfo.h"
 #include "findreplace.h"
 
@@ -41,6 +42,7 @@ private:
 	Ui::MainWindow *ui;
 	QMap<QsciScintilla*, EditorInfo*> info;
 	FindReplace* finddlg = nullptr;
+	QTimer* autoSave;
 	enum StatusType {
 		ST_ROW,
 		ST_COL,
