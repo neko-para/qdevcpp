@@ -52,3 +52,8 @@ FORMS += \
     aboutqdevcpp.ui \
     findreplace.ui \
     editorconfig.ui
+
+RESOURCES += \
+    resource.qrc
+
+DISTFILES +=
