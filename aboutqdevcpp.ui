@@ -31,7 +31,7 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QLabel" name="label">
+      <widget class="QLabel" name="labelQDevCpp">
        <property name="font">
         <font>
          <pointsize>20</pointsize>

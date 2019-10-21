@@ -1,6 +1,9 @@
 #ifndef CONFIG_H
 #define CONFIG_H
 
+#define QDEVCPP_VERSION_MAJOR 0
+#define QDEVCPP_VERSION_MINOR 0
+
 #include <QJsonValue>
 
 struct Config {
