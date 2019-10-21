@@ -1,3 +1,5 @@
+![](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp.ico)
+
 # QDevCpp
 
 以OIer为用户群体的DevC++的升~~降~~级版。
