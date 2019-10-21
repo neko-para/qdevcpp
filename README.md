@@ -18,6 +18,7 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 * [ ] branch color
 	* [ ] 自定义配色
 * [ ] branch edit
+	* [x] 对齐
 	* [ ] 快捷注释
 		* [ ] 翻转注释
 	* [ ] 额外的编辑功能

@@ -116,6 +116,50 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionSelectAll, &QAction::triggered, [&]() {
 		currentEditor()->selectAll();
 	});
+	connect(ui->actionIndent, &QAction::triggered, [&]() {
+		int sl, si, el, ei;
+		auto e = currentEditor();
+		e->getSelection(&sl, &si, &el, &ei);
+		if (sl != el) {
+			e->beginUndoAction();
+			si = 0;
+			if (ei) {
+				if (e->lines() == el + 1) {
+					ei = e->lineLength(el) + 1;
+				} else {
+					++el;
+					ei = 0;
+				}
+			}
+			for (int i = el; i >= sl; --i) {
+				e->indent(i);
+			}
+			e->endUndoAction();
+			e->setSelection(sl, 0, el, ei);
+		}
+	});
+	connect(ui->actionUnindent, &QAction::triggered, [&]() {
+		int sl, si, el, ei;
+		auto e = currentEditor();
+		e->getSelection(&sl, &si, &el, &ei);
+		if (sl != el) {
+			e->beginUndoAction();
+			si = 0;
+			if (ei) {
+				if (e->lines() == el + 1) {
+					ei = e->lineLength(el) + 1;
+				} else {
+					++el;
+					ei = 0;
+				}
+			}
+			for (int i = el; i >= sl; --i) {
+				e->unindent(i);
+			}
+			e->endUndoAction();
+			e->setSelection(sl, 0, el, ei);
+		}
+	});
 	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
 	connect(ui->actionNew, &QAction::triggered, [&]() {
 		QsciScintilla* e = createEditor(ui->SrcTab);
