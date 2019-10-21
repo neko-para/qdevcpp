@@ -121,9 +121,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		QsciScintilla* e = createEditor(ui->SrcTab);
 		auto& ei = info[e];
 		ei = new EditorInfo(e, ui);
+		ei->updateEditorConfig(editorConfig);
 		ui->SrcTab->addTab(e, ei->generateTitle());
 		ui->SrcTab->setCurrentWidget(e);
-		ei->updateEditorConfig(editorConfig);
+		e->setFocus();
 	});
 	connect(ui->actionOpen, &QAction::triggered, [&]() {
 		QStringList paths = QFileDialog::getOpenFileNames(this, "qdevcpp - 打开", "", "所有支持类型 (*.c *.cpp *.cc *.cxx *.h *.hpp);;所有文件 (*.*)");
@@ -140,9 +141,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 				auto& ei = info[e];
 				ei = new EditorInfo(e, ui);
 				if (ei->open(p)) {
+					ei->updateEditorConfig(editorConfig);
 					ui->SrcTab->addTab(e, ei->generateTitle());
 					ui->SrcTab->setCurrentWidget(e);
-					ei->updateEditorConfig(editorConfig);
+					e->setFocus();
 				} else {
 					ei->deleteLater();
 				}
