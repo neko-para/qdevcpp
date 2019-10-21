@@ -54,7 +54,7 @@ sudo apt install libqscintilla2-qt5-dev
 		* [ ] 移动行
 	* [ ] 快捷注释
 		* [ ] 翻转注释
-	* [ ] 状态栏
+	* [x] 状态栏
 	* [ ] 括号折叠
 	* [ ] 括号补全
 	* [ ] 拖拽文件

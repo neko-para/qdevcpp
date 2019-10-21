@@ -2,9 +2,11 @@
 #define EDITORINFO_H
 
 #include <QDateTime>
+#include <QLabel>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 #include "editorconfig.h"
+
 
 namespace Ui {
 	class MainWindow;
@@ -31,7 +33,8 @@ private slots:
 	void modificationChanged(bool m);
 public slots:
 	void updateUndoRedoState();
-	void updateCopyCutState();
+	void updateSelectionState();
+	void updateStatusInfo();
 public:
 	EditorInfo(QsciScintilla* e, Ui::MainWindow* ui);
 	virtual ~EditorInfo();

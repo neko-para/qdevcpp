@@ -42,7 +42,7 @@
     </item>
    </layout>
   </widget>
-  <widget class="QStatusBar" name="StatusBar"/>
+  <widget class="QStatusBar" name="statusBar"/>
   <widget class="QMenuBar" name="menuBar">
    <property name="geometry">
     <rect>
@@ -103,7 +103,7 @@
     <addaction name="actionDebugToolDock"/>
     <addaction name="actionStatusBar"/>
    </widget>
-   <widget class="QMenu" name="menu_R">
+   <widget class="QMenu" name="menuRun">
     <property name="title">
      <string>运行</string>
     </property>
@@ -114,14 +114,14 @@
     <addaction name="separator"/>
     <addaction name="actionDebug"/>
    </widget>
-   <widget class="QMenu" name="menu">
+   <widget class="QMenu" name="menuAbout">
     <property name="title">
      <string>关于</string>
     </property>
     <addaction name="actionAboutQDevCpp"/>
     <addaction name="actionAboutQt"/>
    </widget>
-   <widget class="QMenu" name="menu_2">
+   <widget class="QMenu" name="menuTool">
     <property name="title">
      <string>工具</string>
     </property>
@@ -133,9 +133,9 @@
    <addaction name="menuEdit"/>
    <addaction name="menuSearch"/>
    <addaction name="menuVisual"/>
-   <addaction name="menu_R"/>
-   <addaction name="menu_2"/>
-   <addaction name="menu"/>
+   <addaction name="menuRun"/>
+   <addaction name="menuTool"/>
+   <addaction name="menuAbout"/>
   </widget>
   <widget class="QDockWidget" name="dockDebug">
    <attribute name="dockWidgetArea">
@@ -575,6 +575,9 @@
    </property>
   </action>
   <action name="actionCopyRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>复制行</string>
    </property>
@@ -583,6 +586,9 @@
    </property>
   </action>
   <action name="actionDelRow">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>删除行</string>
    </property>
@@ -607,6 +613,9 @@
    </property>
   </action>
   <action name="actionIndent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>缩进</string>
    </property>
@@ -615,6 +624,9 @@
    </property>
   </action>
   <action name="actionUnindent">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>取消缩进</string>
    </property>

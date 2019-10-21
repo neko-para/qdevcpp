@@ -4,6 +4,8 @@
 #include <QJsonDocument>
 #include <QJsonArray>
 #include <QClipboard>
+#include <QFileDialog>
+#include <QFileInfo>
 #include "global.h"
 #include "compileconfig.h"
 #include "editorconfig.h"
@@ -85,6 +87,11 @@ void saveConfig() {
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWindow) {
 	::window = this;
 	ui->setupUi(this);
+	for (int i = 0; i < ST_COUNT; ++i) {
+		auto& l = status[i];
+		l = new QLabel(ui->statusBar);
+		ui->statusBar->addWidget(l, 1);
+	}
 	// Disable Debug
 	ui->dockDebug->setVisible(false);
 	ui->actionDebug->setEnabled(false);
@@ -123,6 +130,9 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		e->beginUndoAction();
 		e->setSelection(l, 0, l, e->lineLength(l));
 		QString d = e->selectedText();
+		if (l + 1 == e->lines()) {
+			d += "\n";
+		}
 		e->insertAt(d, l, 0);
 		e->setCursorPosition(l, i);
 		e->endUndoAction();
@@ -263,7 +273,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionCompileInfoDock, &QAction::toggled, ui->dockInfo, &QDockWidget::setVisible);
 	connect(ui->dockDebug, &QDockWidget::visibilityChanged, ui->actionDebugToolDock, &QAction::setChecked);
 	connect(ui->actionDebugToolDock, &QAction::toggled, ui->dockDebug, &QDockWidget::setVisible);
-	connect(ui->actionStatusBar, &QAction::toggled, ui->StatusBar, &QStatusBar::setVisible);
+	connect(ui->actionStatusBar, &QAction::toggled, ui->statusBar, &QStatusBar::setVisible);
 	connect(ui->actionCompile, &QAction::triggered, [&]() {
 		auto ei = info[currentEditor()];
 		if (!ei->save()) {
@@ -374,28 +384,53 @@ void MainWindow::removeOther(EditorInfo* ei) {
 	}
 }
 
+void setEnabled(bool e, QList<QAction*> actions) {
+	for (auto a : actions) {
+		a->setEnabled(e);
+	}
+}
+
 void MainWindow::updateTab(int idx) {
 	if (idx == -1) {
-		ui->actionSave->setEnabled(false);
-		ui->actionSaveAs->setEnabled(false);
-		ui->actionClose->setEnabled(false);
-		ui->actionCloseAll->setEnabled(false);
-		ui->actionUndo->setEnabled(false);
-		ui->actionRedo->setEnabled(false);
-		ui->actionCopy->setEnabled(false);
-		ui->actionCut->setEnabled(false);
-		ui->actionSelectAll->setEnabled(false);
+		::setEnabled(false, {
+						 ui->actionSave,
+						 ui->actionSaveAs,
+						 ui->actionClose,
+						 ui->actionCloseAll,
+						 ui->actionUndo,
+						 ui->actionRedo,
+						 ui->actionCopy,
+						 ui->actionCut,
+						 ui->actionPaste,
+						 ui->actionSelectAll,
+						 ui->actionCopyRow,
+						 ui->actionDelRow,
+						 ui->actionIndent,
+						 ui->actionUnindent,
+					 });
+		for (auto l : status) {
+			l->setVisible(false);
+		}
 		finddlg->setEditorInfo(nullptr);
 	} else {
-		ui->actionSave->setEnabled(true);
-		ui->actionSaveAs->setEnabled(true);
-		ui->actionClose->setEnabled(true);
-		ui->actionCloseAll->setEnabled(true);
-		ui->actionSelectAll->setEnabled(true);
+		::setEnabled(true, {
+						 ui->actionSave,
+						 ui->actionSaveAs,
+						 ui->actionClose,
+						 ui->actionCloseAll,
+						 ui->actionPaste,
+						 ui->actionSelectAll,
+						 ui->actionCopyRow,
+						 ui->actionDelRow,
+					 });
 		EditorInfo* ei = info[currentEditor()];
 		ei->updateUndoRedoState();
-		ei->updateCopyCutState();
+		ei->updateSelectionState();
 		finddlg->setEditorInfo(ei);
+		for (auto l : status) {
+			l->setVisible(true);
+		}
+		ei->updateStatusInfo();
 	}
 	updateCompileActions();
 	updatePasteAction();
