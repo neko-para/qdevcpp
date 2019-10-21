@@ -47,7 +47,7 @@ sudo apt install libqscintilla2-qt5-dev
 * [x] 快捷注释
 * [ ] 行编辑
 	* [x] 复制,删除行
-	* [ ] 移动行
+	* [x] 移动行
 * [x] 状态栏
 * [ ] 制作windows binary
 

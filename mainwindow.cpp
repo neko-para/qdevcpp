@@ -253,9 +253,61 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		e->removeSelectedText();
 		e->endUndoAction();
 	});
-	connect(ui->actionIndent, &QAction::triggered, [&]() {
-		int sl, si, el, ei;
+	connect(ui->actionMoveRowUp, &QAction::triggered, [&]() {
 		auto e = currentEditor();
+		int l, i;
+		e->getCursorPosition(&l, &i);
+		int sl, si, el, ei;
+		e->getSelection(&sl, &si, &el, &ei);
+		if (sl == -1) {
+			sl = el = l;
+		}
+		if (sl == 0) {
+			return;
+		}
+		bool atend = (el + 1 == e->lines());
+		e->beginUndoAction();
+		e->setSelection(sl, 0, el, e->lineLength(el));
+		QString s = e->selectedText();
+		if (atend) {
+			s += "\n";
+		}
+		e->removeSelectedText();
+		e->insertAt(s, sl - 1, 0);
+		if (atend) {
+			e->setSelection(el, e->lineLength(el) - 1, el, e->lineLength(el));
+			e->removeSelectedText();
+		}
+		e->setSelection(sl - 1, 0, el - 1, e->lineLength(el - 1) - 1);
+		e->endUndoAction();
+	});
+	connect(ui->actionMoveRowDown, &QAction::triggered, [&]() {
+		auto e = currentEditor();
+		int l, i;
+		e->getCursorPosition(&l, &i);
+		int sl, si, el, ei;
+		e->getSelection(&sl, &si, &el, &ei);
+		if (sl == -1) {
+			sl = el = l;
+		}
+		if (el + 1 == e->lines()) {
+			return;
+		}
+		bool atend = (el + 2 == e->lines());
+		e->beginUndoAction();
+		e->setSelection(sl, 0, el, e->lineLength(el));
+		QString s = e->selectedText();
+		if (atend) {
+			s = "\n" + s.left(s.length() - 1);
+		}
+		e->removeSelectedText();
+		e->insertAt(s, sl, e->lineLength(sl));
+		e->setSelection(sl + 1, 0, el + 1, e->lineLength(el + 1) - (atend ? 0 : 1));
+		e->endUndoAction();
+	});
+	connect(ui->actionIndent, &QAction::triggered, [&]() {
+		auto e = currentEditor();
+		int sl, si, el, ei;
 		e->getSelection(&sl, &si, &el, &ei);
 		if (sl != el) {
 			e->beginUndoAction();
@@ -276,8 +328,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		}
 	});
 	connect(ui->actionUnindent, &QAction::triggered, [&]() {
-		int sl, si, el, ei;
 		auto e = currentEditor();
+		int sl, si, el, ei;
 		e->getSelection(&sl, &si, &el, &ei);
 		if (sl != el) {
 			e->beginUndoAction();
