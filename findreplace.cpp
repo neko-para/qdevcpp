@@ -4,6 +4,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QKeyEvent>
+#include <QRegularExpression>
 
 QJsonValue FindReplaceConfig::toJson() const {
 	QJsonObject obj;
