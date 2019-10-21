@@ -18,8 +18,9 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 
 #### Mingw
 
-<!-- [64位]() -->
-<!-- [32位]() -->
+[静态编译 64位](https://github.com/neko-para/qdevcpp/releases/download/v0.0/qdevcpp-mingw-x64-static-release.7z)
+
+[静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.0/qdevcpp-mingw-x86-static-release.7z)
 
 ## Build
 
