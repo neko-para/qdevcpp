@@ -6,6 +6,7 @@
 #include <QClipboard>
 #include <QFileDialog>
 #include <QFileInfo>
+#include <QRegularExpression>
 #include "global.h"
 #include "compileconfig.h"
 #include "editorconfig.h"
@@ -205,21 +206,33 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	});
 	connect(ui->actionToggleComment, &QAction::triggered, [&]() {
 		auto e = currentEditor();
-		int l, i;
-		e->getCursorPosition(&l, &i);
-		e->beginUndoAction();
-		e->setSelection(l, 0, l, e->lineLength(l));
-		if (e->selectedText().startsWith("//")) {
-			e->setSelection(l, 0, l, 2);
-			e->removeSelectedText();
-			i = std::max(0, i - 2);
-		} else {
-			e->selectAll(false);
-			e->setCursorPosition(l, 0);
-			e->insert("//");
-			i += 2;
+		int sl, si, el, ei;
+		e->getSelection(&sl, &si, &el, &ei);
+		if (sl == -1) {
+			int l, i;
+			e->getCursorPosition(&l, &i);
+			sl = el = l;
 		}
-		e->setCursorPosition(l, i);
+		e->beginUndoAction();
+		e->setSelection(sl, 0, el, e->lineLength(el));
+		QString text = e->selectedText();
+		QRegularExpression nc(R"(\n([^/]|/[^/]))");
+		bool atend = (el + 1 == e->lines());
+		if (!atend) {
+			text = text.left(text.length() - 1);
+		}
+		text = "\n" + text;
+		if (nc.match(text).hasMatch()) {
+			text = text.replace("\n", "\n//");
+		} else {
+			text = text.replace("\n//", "\n");
+		}
+		text = text.mid(1);
+		if (!atend) {
+			text = text + "\n";
+		}
+		e->replaceSelectedText(text);
+		e->setSelection(sl, 0, el, std::max(0, e->lineLength(el) - 1));
 		e->endUndoAction();
 	});
 	connect(ui->actionCopyRow, &QAction::triggered, [&]() {

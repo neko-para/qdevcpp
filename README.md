@@ -65,6 +65,7 @@ sudo apt install libqscintilla2-qt5-dev
 
 ### v0.1
 
+* [x] 修复快捷注释只注释一行
 * [ ] 自更新
 * [ ] 命令行参数解析
 * [ ] 文件关联
