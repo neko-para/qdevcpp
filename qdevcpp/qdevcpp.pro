@@ -57,3 +57,5 @@ RESOURCES += \
     resource.qrc
 
 DISTFILES +=
+
+win32:RC_ICONS = qdevcpp.ico
