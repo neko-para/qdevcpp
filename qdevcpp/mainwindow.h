@@ -28,6 +28,8 @@ public:
 	EditorInfo* findTab(const QString& path, EditorInfo* except = nullptr);
 	void removeOther(EditorInfo* ei);
 
+	void open(const QStringList& paths);
+
 public slots:
 	void updateTab(int idx);
 	void updateCompileActions();

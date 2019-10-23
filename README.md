@@ -67,12 +67,12 @@ sudo apt install libqscintilla2-qt5-dev
 
 * [x] 修复快捷注释只注释一行
 * [x] 调整项目结构
-* [ ] 自更新
-* [ ] 命令行参数解析
+* [x] 命令行参数解析
 * [ ] 文件关联
 	* [ ] Windows
 	* [ ] Linux
 		* [ ] Ubuntu
+* [ ] 自更新
 
 ### v0.2
 

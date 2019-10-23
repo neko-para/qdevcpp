@@ -136,25 +136,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		if (!paths.size()) {
 			return;
 		}
-		for (const auto& p : paths) {
-			auto pei = findTab(p);
-			if (pei) {
-				ui->SrcTab->setCurrentWidget(pei->editor);
-				pei->editor->setFocus();
-			} else {
-				QsciScintilla* e = createEditor(ui->SrcTab);
-				auto& ei = info[e];
-				ei = new EditorInfo(e, ui);
-				if (ei->open(p)) {
-					ei->updateEditorConfig(editorConfig);
-					ui->SrcTab->addTab(e, ei->generateTitle());
-					ui->SrcTab->setCurrentWidget(e);
-					e->setFocus();
-				} else {
-					ei->deleteLater();
-				}
-			}
-		}
+		open(paths);
 	});
 	connect(ui->actionSave, &QAction::triggered, [&]() {
 		auto ei = info[currentEditor()];
@@ -482,6 +464,28 @@ void MainWindow::removeOther(EditorInfo* ei) {
 	if (pei) {
 		ui->SrcTab->removeTab(ui->SrcTab->indexOf(pei->editor));
 		pei->deleteLater();
+	}
+}
+
+void MainWindow::open(const QStringList& paths) {
+	for (const auto& p : paths) {
+		auto pei = findTab(p);
+		if (pei) {
+			ui->SrcTab->setCurrentWidget(pei->editor);
+			pei->editor->setFocus();
+		} else {
+			QsciScintilla* e = createEditor(ui->SrcTab);
+			auto& ei = info[e];
+			ei = new EditorInfo(e, ui);
+			if (ei->open(p)) {
+				ei->updateEditorConfig(editorConfig);
+				ui->SrcTab->addTab(e, ei->generateTitle());
+				ui->SrcTab->setCurrentWidget(e);
+				e->setFocus();
+			} else {
+				ei->deleteLater();
+			}
+		}
 	}
 }
 
