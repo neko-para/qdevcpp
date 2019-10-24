@@ -32,7 +32,8 @@ SOURCES += \
     editorinfo.cpp \
     aboutqdevcpp.cpp \
     findreplace.cpp \
-    editorconfig.cpp
+    editorconfig.cpp \
+    environmentconfig.cpp
 
 HEADERS += \
         mainwindow.h \
@@ -44,18 +45,21 @@ HEADERS += \
     findreplace.h \
     config.h \
     confighelp.h \
-    editorconfig.h
+    editorconfig.h \
+    environmentconfig.h
 
 FORMS += \
         mainwindow.ui \
     compileconfig.ui \
     aboutqdevcpp.ui \
     findreplace.ui \
-    editorconfig.ui
+    editorconfig.ui \
+    environmentconfig.ui
 
 RESOURCES += \
     resource.qrc
 
-DISTFILES +=
+DISTFILES += \
+    qdevcpp.desktop
 
 win32:RC_ICONS = qdevcpp.ico

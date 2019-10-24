@@ -8,11 +8,12 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 #include "global.h"
+#include "aboutqdevcpp.h"
 #include "compileconfig.h"
 #include "editorconfig.h"
+#include "environmentconfig.h"
 #include "findreplace.h"
 #include "subprocess.h"
-#include "aboutqdevcpp.h"
 
 static EditorConfigure editorConfig;
 static QList<CompileConfigure> compileConfig;
@@ -50,7 +51,10 @@ QJsonArray saveMultiConfig(const QList<Type>& config) {
 }
 
 void loadConfig() {
-	QFile file("qdevcpp.json");
+#ifdef Q_OS_LINUX
+	QString cfg = QString("%1/.qdevcpp/qdevcpp.json").arg(QDir::homePath());
+#endif
+	QFile file(cfg);
 	if (!file.open(QIODevice::ReadOnly)) {
 		return;
 	}
@@ -71,7 +75,10 @@ void loadConfig() {
 }
 
 void saveConfig() {
-	QFile file("qdevcpp.json");
+#ifdef Q_OS_LINUX
+	QString cfg = QString("%1/.qdevcpp/qdevcpp.json").arg(QDir::homePath());
+#endif
+	QFile file(cfg);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		return;
 	}
@@ -386,6 +393,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			}
 			updateCompileActions();
 		}
+	});
+	connect(ui->actionEnvironmentConfig, &QAction::triggered, [&]() {
+		EnvironmentConfig dlg(this);
+		dlg.exec();
 	});
 	connect(ui->actionEditorConfig, &QAction::triggered, [&]() {
 		EditorConfig dlg(editorConfig, this);

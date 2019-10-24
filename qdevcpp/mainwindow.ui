@@ -547,9 +547,6 @@
    </property>
   </action>
   <action name="actionEnvironmentConfig">
-   <property name="enabled">
-    <bool>false</bool>
-   </property>
    <property name="text">
     <string>环境选项</string>
    </property>

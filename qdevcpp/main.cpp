@@ -1,26 +1,15 @@
 #include "mainwindow.h"
 #include <QApplication>
-#include <QCommandLineParser>
 #include "config.h"
-
-void buildParser(QCommandLineParser& parser) {
-	parser.addHelpOption();
-	parser.addVersionOption();
-	QCommandLineOption optFile(QStringList{"f", "file"});
-	optFile.setValueName("file");
-	optFile.setDescription("Files to be opened");
-	parser.addOption(optFile);
-}
 
 int main(int argc, char *argv[]) {
 	QApplication a(argc, argv);
 	a.setApplicationName("qdevcpp");
 	a.setApplicationVersion(QString("%1.%2").arg(QDEVCPP_VERSION_MAJOR).arg(QDEVCPP_VERSION_MINOR));
-	QCommandLineParser parser;
-	buildParser(parser);
-	parser.process(a);
+	QStringList files = QApplication::arguments();
+	files.removeAll("");
 	MainWindow w;
 	w.show();
-	w.open(parser.values("file"));
+	w.open(files);
 	return a.exec();
 }

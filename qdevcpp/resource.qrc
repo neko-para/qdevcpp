@@ -2,5 +2,6 @@
     <qresource prefix="/">
         <file>qdevcpp.svg</file>
         <file>qdevcpp.ico</file>
+        <file>qdevcpp.desktop</file>
     </qresource>
 </RCC>

@@ -1,0 +1,8 @@
+[Desktop Entry]
+Name=QDevCpp
+Comment=Run QDevCpp
+Exec=@ %F
+Icon=qdevcpp
+Terminal=false
+Type=Application
+MimeType=text/x-csrc;text/c-chdr;text/x-c++src;text/x-c++hdr
