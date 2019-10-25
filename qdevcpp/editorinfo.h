@@ -7,10 +7,22 @@
 #include <Qsci/qscilexer.h>
 #include "editorconfig.h"
 
-
 namespace Ui {
 	class MainWindow;
 }
+
+class CoreEditor : public QsciScintilla {
+	Q_OBJECT
+
+protected:
+	virtual void wheelEvent(QWheelEvent* );
+	virtual void focusInEvent(QFocusEvent* );
+	virtual void keyPressEvent(QKeyEvent* );
+public:
+	using QsciScintilla::QsciScintilla;
+};
+
+//typedef QsciScintilla Editor;
 
 class EditorInfo : public QObject {
 	Q_OBJECT
@@ -18,7 +30,7 @@ class EditorInfo : public QObject {
 	friend class FindReplace;
 	friend class MainWindow;
 
-	QsciScintilla* editor;
+	CoreEditor* editor;
 	Ui::MainWindow* ui;
 	QString path;
 	bool modified = false;
@@ -36,8 +48,9 @@ public slots:
 	void updateSelectionState();
 	void updateStatusInfo();
 public:
-	EditorInfo(QsciScintilla* e, Ui::MainWindow* ui);
+	EditorInfo(CoreEditor* e, Ui::MainWindow* ui);
 	virtual ~EditorInfo();
+
 	QString getPath() const {
 		return path;
 	}
@@ -66,6 +79,5 @@ public:
 signals:
 	void pathChange(QString cpath, QString ppath);
 };
-
 
 #endif // EDITORINFO_H

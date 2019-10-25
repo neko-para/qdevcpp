@@ -24,10 +24,9 @@ static FindReplaceConfig findConfig;
 MainWindow* window;
 CompileConfigure* currentConfig;
 
-QsciScintilla* createEditor(QWidget* parent) {
-	QsciScintilla* editor = new QsciScintilla(parent);
+CoreEditor* createEditor() {
+	CoreEditor* editor = new CoreEditor(nullptr);
 	editor->setTabWidth(4);
-	editor->installEventFilter(window);
 	return editor;
 }
 
@@ -125,10 +124,10 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(clipboard, &QClipboard::changed, this, &MainWindow::updatePasteAction);
 	connect(ui->SrcTab, &QTabWidget::currentChanged, this, &MainWindow::updateTab);
 	connect(ui->SrcTab, &QTabWidget::tabCloseRequested, [&](int idx) {
-		closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(idx)));
+		closeTab(ui->SrcTab->widget(idx));
 	});
 	connect(ui->actionNew, &QAction::triggered, [&]() {
-		QsciScintilla* e = createEditor(ui->SrcTab);
+		CoreEditor* e = createEditor();
 		auto& ei = info[e];
 		ei = new EditorInfo(e, ui);
 		ei->updateEditorConfig(editorConfig);
@@ -158,15 +157,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		removeOther(ei);
 	});
 	connect(ui->actionClose, &QAction::triggered, [&]() {
-		closeTab(currentEditor());
+		closeTab(ui->SrcTab->currentWidget());
 	});
 	connect(ui->actionCloseAll, &QAction::triggered, [&]() {
-		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+		while (ui->SrcTab->count() && closeTab(ui->SrcTab->widget(0))) {
 			;
 		}
 	});
 	connect(ui->actionExit, &QAction::triggered, [&]() {
-		while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+		while (ui->SrcTab->count() && closeTab(ui->SrcTab->widget(0))) {
 			;
 		}
 		if (!ui->SrcTab->count()) {
@@ -444,12 +443,12 @@ MainWindow::~MainWindow() {
 	delete ui;
 }
 
-QsciScintilla* MainWindow::currentEditor() {
-	return dynamic_cast<QsciScintilla*>(ui->SrcTab->currentWidget());
+CoreEditor* MainWindow::currentEditor() {
+	return dynamic_cast<CoreEditor*>(ui->SrcTab->currentWidget());
 }
 
-bool MainWindow::closeTab(QsciScintilla* e) {
-	auto ei = info[e];
+bool MainWindow::closeTab(QWidget* e) {
+	auto ei = info[dynamic_cast<CoreEditor*>(e)];
 	if (!ei->askSave()) {
 		return false;
 	}
@@ -483,7 +482,7 @@ void MainWindow::open(const QStringList& paths) {
 			ui->SrcTab->setCurrentWidget(pei->editor);
 			pei->editor->setFocus();
 		} else {
-			QsciScintilla* e = createEditor(ui->SrcTab);
+			CoreEditor* e = createEditor();
 			auto& ei = info[e];
 			ei = new EditorInfo(e, ui);
 			if (ei->open(p)) {
@@ -574,35 +573,8 @@ void MainWindow::updateWindowTitle() {
 	}
 }
 
-bool MainWindow::eventFilter(QObject *watched, QEvent *event) {
-	QsciScintilla* e = dynamic_cast<QsciScintilla*>(watched);
-	if (e) {
-		if (event->type() == QEvent::FocusIn) {
-			auto ei = info[e];
-			if (ei->isModifiedByOthers()) {
-				ei->reload();
-			}
-		} else if (event->type() == QEvent::KeyPress) {
-			QKeyEvent* ke = dynamic_cast<QKeyEvent*>(event);
-			if (ke->modifiers() == Qt::ControlModifier) {
-				switch (ke->key()) {
-				case Qt::Key_D:
-					ui->actionDelRow->trigger();
-					ke->accept();
-					return true;
-				case Qt::Key_Slash:
-					ui->actionToggleComment->trigger();
-					ke->accept();
-					return true;
-				}
-			}
-		}
-	}
-	return QMainWindow::eventFilter(watched, event);
-}
-
 void MainWindow::closeEvent(QCloseEvent* e) {
-	while (ui->SrcTab->count() && closeTab(dynamic_cast<QsciScintilla*>(ui->SrcTab->widget(0)))) {
+	while (ui->SrcTab->count() && closeTab(dynamic_cast<CoreEditor*>(ui->SrcTab->widget(0)))) {
 		;
 	}
 	if (ui->SrcTab->count()) {

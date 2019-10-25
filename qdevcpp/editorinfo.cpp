@@ -9,6 +9,45 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "subprocess.h"
+#include <QDebug>
+
+void CoreEditor::wheelEvent(QWheelEvent* e) {
+	if (e->modifiers() == Qt::ControlModifier) {
+		QPoint ns = e->angleDelta() / QWheelEvent::DefaultDeltasPerStep;
+		if (ns.ry() < 0) {
+			zoomOut(2 * -ns.ry());
+		} else {
+			zoomIn(2 * ns.ry());
+		}
+		e->accept();
+	} else {
+		QsciScintilla::wheelEvent(e);
+	}
+}
+
+void CoreEditor::focusInEvent(QFocusEvent* e) {
+	auto ei = ::window->info[this];
+	if (ei->isModifiedByOthers()) {
+		ei->reload();
+	}
+	QsciScintilla::focusInEvent(e);
+}
+
+void CoreEditor::keyPressEvent(QKeyEvent* e) {
+	if (e->modifiers() == Qt::ControlModifier) {
+		switch (e->key()) {
+		case Qt::Key_D:
+			::window->ui->actionDelRow->trigger();
+			e->accept();
+			return;
+		case Qt::Key_Slash:
+			::window->ui->actionToggleComment->trigger();
+			e->accept();
+			return;
+		}
+	}
+	return QsciScintilla::keyPressEvent(e);
+}
 
 int EditorInfo::untitled_next;
 QList<int> EditorInfo::untitled_rest;
@@ -54,13 +93,13 @@ QsciLexerCPP* createLexer() {
 	return lexer;
 }
 
-EditorInfo::EditorInfo(QsciScintilla *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
-	connect(e, &QsciScintilla::modificationChanged, this, &EditorInfo::modificationChanged);
-	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
-	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateSelectionState);
-	connect(e, &QsciScintilla::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
-	connect(e, &QsciScintilla::selectionChanged, this, &EditorInfo::updateStatusInfo);
-	connect(e, &QsciScintilla::textChanged, this, &EditorInfo::updateUndoRedoState);
+EditorInfo::EditorInfo(CoreEditor *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
+	connect(e, &CoreEditor::modificationChanged, this, &EditorInfo::modificationChanged);
+	connect(e, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
+	connect(e, &CoreEditor::selectionChanged, this, &EditorInfo::updateSelectionState);
+	connect(e, &CoreEditor::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(e, &CoreEditor::selectionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(e, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(this, &EditorInfo::pathChange, [&](QString) {
 		if (shallSyntaxHighlight()) {
 			if (!editor->lexer()) {

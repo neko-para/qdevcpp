@@ -3,8 +3,6 @@
 
 #include <QMainWindow>
 #include <QLabel>
-#include <Qsci/qsciscintilla.h>
-#include <Qsci/qscilexer.h>
 #include <QTimer>
 #include "editorinfo.h"
 #include "findreplace.h"
@@ -16,15 +14,16 @@ namespace Ui {
 class MainWindow : public QMainWindow {
 	Q_OBJECT
 
+	friend class CoreEditor;
 	friend class EditorInfo;
 
 public:
 	explicit MainWindow(QWidget *parent = 0);
 	~MainWindow();
 
-	QsciScintilla* currentEditor();
+	CoreEditor* currentEditor();
 
-	bool closeTab(QsciScintilla* e);
+	bool closeTab(QWidget* e);
 	EditorInfo* findTab(const QString& path, EditorInfo* except = nullptr);
 	void removeOther(EditorInfo* ei);
 
@@ -37,12 +36,11 @@ public slots:
 	void updateWindowTitle();
 
 protected:
-	virtual bool eventFilter(QObject *watched, QEvent *event);
 	virtual void closeEvent(QCloseEvent* e);
 
 private:
 	Ui::MainWindow *ui;
-	QMap<QsciScintilla*, EditorInfo*> info;
+	QMap<CoreEditor*, EditorInfo*> info;
 	FindReplace* finddlg = nullptr;
 	QTimer* autoSave;
 	enum StatusType {
