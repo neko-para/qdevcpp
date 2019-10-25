@@ -8,9 +8,12 @@ SubProcess::SubProcess(QPlainTextEdit* log, const QString& exe, QObject* parent)
 
 bool SubProcess::start() {
 #ifdef Q_OS_WIN32
-//	proc->start("C:\\Windows\\system32\\cmd.exe", QStringList{"-e", QString("\"%1\"; echo $?")});
+	exe = exe.replace('/', '\\');
+	proc->setProgram(R"(C:\Windows\system32\cmd.exe)");
+	proc->setNativeArguments(QString(R"(/C start cmd /C ""%1" & echo. & echo. & echo 返回值 %errorlevel% & pause")").arg(exe));
+	proc->start();
 #elif defined(Q_OS_LINUX)
-	proc->start("/usr/bin/x-terminal-emulator", QStringList{"-e", QString("\"%1\"; echo \"\\n\\n返回值$?。按任意键继续……\"; read X").arg(exe)});
+	proc->start("/usr/bin/x-terminal-emulator", QStringList { "-e", QString("\"%1\"; echo \"\\n\\n返回值 $?\n请按任意键继续. . .\"; read X").arg(exe)});
 #endif
 	log->appendPlainText(QString("[执行]%1").arg(exe));
 	QEventLoop loop;
