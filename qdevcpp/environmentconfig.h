@@ -21,6 +21,8 @@ public:
 	explicit EnvironmentConfig(QWidget *parent = 0);
 	~EnvironmentConfig();
 
+	void bind();
+
 private:
 	Ui::EnvironmentConfig *ui;
 	bool installed;

@@ -70,8 +70,9 @@ sudo apt install libqscintilla2-qt5-dev
 * [x] 命令行参数解析
 * [x] 自更新(仅Windows)
 * [ ] 文件关联
-	* [ ] Windows
+	* [x] Windows
 	* [x] Linux
+	* [ ] 关联文件图标
 * [ ] 滚轮缩放
 
 ### v0.2

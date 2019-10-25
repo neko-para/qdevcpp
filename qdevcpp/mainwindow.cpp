@@ -51,9 +51,7 @@ QJsonArray saveMultiConfig(const QList<Type>& config) {
 }
 
 void loadConfig() {
-#ifdef Q_OS_LINUX
 	QString cfg = QString("%1/.qdevcpp/qdevcpp.json").arg(QDir::homePath());
-#endif
 	QFile file(cfg);
 	if (!file.open(QIODevice::ReadOnly)) {
 		return;
@@ -75,9 +73,9 @@ void loadConfig() {
 }
 
 void saveConfig() {
-#ifdef Q_OS_LINUX
-	QString cfg = QString("%1/.qdevcpp/qdevcpp.json").arg(QDir::homePath());
-#endif
+	QString dir = QString("%1/.qdevcpp").arg(QDir::homePath());
+	QString cfg = QString("%1/qdevcpp.json").arg(dir);
+	QDir().mkpath(dir);
 	QFile file(cfg);
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		return;

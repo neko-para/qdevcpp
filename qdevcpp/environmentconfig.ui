@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>158</width>
+    <width>260</width>
     <height>250</height>
    </rect>
   </property>
@@ -35,6 +35,13 @@
          </property>
         </widget>
        </item>
+       <item row="0" column="1">
+        <widget class="QPushButton" name="install">
+         <property name="text">
+          <string>安装</string>
+         </property>
+        </widget>
+       </item>
        <item row="1" column="0">
         <widget class="QLabel" name="label">
          <property name="text">
@@ -50,7 +57,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>c源代码</string>
+            <string>C源代码</string>
            </property>
           </widget>
          </item>
@@ -60,7 +67,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>c头文件</string>
+            <string>C/C++头文件</string>
            </property>
           </widget>
          </item>
@@ -70,7 +77,7 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>c++源代码</string>
+            <string>C++源代码</string>
            </property>
           </widget>
          </item>
@@ -80,18 +87,11 @@
             <bool>false</bool>
            </property>
            <property name="text">
-            <string>c++头文件</string>
+            <string>C++头文件</string>
            </property>
           </widget>
          </item>
         </layout>
-       </item>
-       <item row="0" column="1">
-        <widget class="QPushButton" name="install">
-         <property name="text">
-          <string>安装</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </widget>

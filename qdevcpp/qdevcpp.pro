@@ -63,3 +63,5 @@ DISTFILES += \
     qdevcpp.desktop
 
 win32:RC_ICONS = qdevcpp.ico
+
+QMAKE_TARGET_DESCRIPTION=QDevCpp
