@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp.ico)
+![](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp/qdevcpp.ico)
 
 # QDevCpp
 
