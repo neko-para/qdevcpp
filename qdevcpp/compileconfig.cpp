@@ -12,6 +12,7 @@ QJsonValue CompileConfigure::toJson() const {
 	QJsonObject obj;
 	JSON_SET(name);
 	JSON_SET(gccPath);
+	JSON_SET(gxxPath);
 	JSON_SET(gdbPath);
 	JSON_SET(extraCompile);
 	JSON_SET(extraLink);
@@ -29,6 +30,7 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	QJsonObject obj = value.toObject();
 	JSON_GET(name);
 	JSON_GET(gccPath);
+	JSON_GET(gxxPath);
 	JSON_GET(gdbPath);
 	JSON_GET(extraCompile);
 	JSON_GET(extraLink);
@@ -41,15 +43,17 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	JSON_GET(debug);
 }
 
-void CompileConfigure::start(QProcess& proc, const QString& src) {
+void CompileConfigure::start(QProcess& proc, const QString& src, QString& compiler) {
 	QStringList arg;
 	QFileInfo si(src);
 	arg << src << "-o" << (si.path() + QDir::separator() + si.baseName() + exeSuf);
 	arg << ("-O" + (QStringList{"0", "1", "2", "3", "fast", "g"}[optimize]));
 	if (cSuf.contains(si.suffix())) {
 		arg << ("-std=c" + (QStringList{"90", "99", "11"}[cstd]));
+		compiler = gccPath;
 	} else if (cxxSuf.contains(si.suffix())) {
 		arg << ("-std=c++" + (QStringList{"98", "11", "14", "17"}[cxxstd]));
+		compiler = gxxPath;
 	}
 	arg << ("-m" + (QStringList{"32", "64"}[bit]));
 	switch (warning) {
@@ -72,7 +76,7 @@ void CompileConfigure::start(QProcess& proc, const QString& src) {
 		arg << "-g";
 	}
 	arg << extraCompile.split(QRegularExpression(R"(\n)"), QString::SkipEmptyParts);
-	proc.start(gccPath, arg, QIODevice::ReadOnly);
+	proc.start(compiler, arg, QIODevice::ReadOnly);
 }
 
 CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *parent) : QDialog(parent), ui(new Ui::CompileConfig), config(cfg) {
@@ -104,6 +108,10 @@ CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *pare
 			ui->gccPath->setEnabled(true);
 			ui->gccPath->setText(currentConfig->gccPath);
 			ui->gccBrowse->setEnabled(true);
+			ui->gxxLabel->setEnabled(true);
+			ui->gxxPath->setEnabled(true);
+			ui->gxxPath->setText(currentConfig->gxxPath);
+			ui->gxxBrowse->setEnabled(true);
 			ui->gdbLabel->setEnabled(true);
 			ui->gdbPath->setEnabled(true);
 			ui->gdbPath->setText(currentConfig->gdbPath);
@@ -153,6 +161,19 @@ CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *pare
 		if (path != "") {
 			currentConfig->gccPath = path;
 			ui->gccPath->setText(path);
+		}
+	});
+	connect(ui->gxxBrowse, &QToolButton::clicked, [&]() {
+		QString path = QFileDialog::getOpenFileName(this, "qdevcpp - 打开g++",
+#ifdef Q_OS_LINUX
+													"/usr/bin"
+#elif defined(Q_OS_WINDOWS)
+													""
+#endif
+													, "g++ (*g++" + exeSuf + ")");
+		if (path != "") {
+			currentConfig->gxxPath = path;
+			ui->gxxPath->setText(path);
 		}
 	});
 	connect(ui->gdbBrowse, &QToolButton::clicked, [&]() {

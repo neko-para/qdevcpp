@@ -43,6 +43,7 @@ struct CompileConfigure : public Config {
 	};
 	QString name = "新配置";
 	QString gccPath = "";
+	QString gxxPath = "";
 	QString gdbPath = "";
 	QString extraCompile = "";
 	QString extraLink = "";
@@ -56,7 +57,7 @@ struct CompileConfigure : public Config {
 
 	virtual QJsonValue toJson() const;
 	virtual void fromJson(QJsonValue value);
-	void start(QProcess& proc, const QString& src);
+	void start(QProcess& proc, const QString& src, QString& compiler);
 };
 
 extern CompileConfigure* currentConfig;

@@ -225,8 +225,9 @@ static QTableWidgetItem* generateItem(const QString& s, int align = Qt::AlignCen
 bool EditorInfo::compile() const {
 	QProcess proc;
 	proc.setEnvironment(QProcess::systemEnvironment() << "LANGUAGE=en_US.UTF-8");
-	currentConfig->start(proc, path);
-	ui->Log->appendPlainText(QString("[执行]%1").arg(currentConfig->gccPath));
+	QString cc;
+	currentConfig->start(proc, path, cc);
+	ui->Log->appendPlainText(QString("[执行]%1").arg(cc));
 	proc.setReadChannel(QProcess::StandardError);
 	int retCode = -1;
 	QEventLoop loop;
