@@ -8,6 +8,7 @@ int main(int argc, char *argv[]) {
 	a.setApplicationVersion(QString("%1.%2").arg(QDEVCPP_VERSION_MAJOR).arg(QDEVCPP_VERSION_MINOR));
 	QStringList files = QApplication::arguments();
 	files.removeAll("");
+	files.pop_front();
 	MainWindow w;
 	w.show();
 	w.open(files);

@@ -143,28 +143,18 @@ void EditorInfo::updateEditorConfig(const EditorConfigure& cfg) {
 bool EditorInfo::open(const QString& cpath)  {
 	QFile file(cpath);
 	if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));;
+		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2:%3").arg(QFileInfo(cpath).fileName()).arg(file.error()).arg(file.errorString()));;
 		return false;
 	}
-	qint64 length = file.size();
-	char* buffer = new char[length + 1];
-	if (length == file.read(buffer, length)) {
-		file.close();
-		buffer[length] = 0;
-		QString ppath = path;
-		path = cpath;
-		emit pathChange(cpath, ppath);
-		editor->setText(QString::fromUtf8(buffer));
-		delete[] buffer;
-		editor->setModified(false);
-		whenOpen = QFileInfo(path).lastModified();
-		return true;
-	} else {
-		file.close();
-		delete[] buffer;
-		ui->Log->appendPlainText(QString("[错误]%1打开失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
-		return false;
-	}
+	QByteArray buffer = file.readAll();
+	file.close();
+	QString ppath = path;
+	path = cpath;
+	emit pathChange(cpath, ppath);
+	editor->setText(QString::fromUtf8(buffer));
+	editor->setModified(false);
+	whenOpen = QFileInfo(path).lastModified();
+	return true;
 }
 
 bool EditorInfo::write(const QString& cpath)  {
@@ -174,25 +164,20 @@ bool EditorInfo::write(const QString& cpath)  {
 		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
 		return false;
 	}
-	if (buffer.size() == file.write(buffer)) {
-		file.close();
-		if (path != cpath) {
-			QString ppath = path;
-			path = cpath;
-			emit pathChange(cpath, ppath);
-		}
-		editor->setModified(false);
-		whenOpen = QFileInfo(path).lastModified();
-		return true;
-	} else {
-		file.close();
-		ui->Log->appendPlainText(QString("[错误]%1保存失败 - %2").arg(QFileInfo(cpath).fileName()).arg(file.errorString()));
-		return false;
+	file.write(buffer);
+	file.close();
+	if (path != cpath) {
+		QString ppath = path;
+		path = cpath;
+		emit pathChange(cpath, ppath);
 	}
+	editor->setModified(false);
+	whenOpen = QFileInfo(path).lastModified();
+	return true;
 }
 
 bool EditorInfo::saveas()  {
-	QString cpath = QFileDialog::getSaveFileName(editor, "qdevcpp - 另存为", "", "C源代码 (*.c);;C++源代码 (*.cpp *.cc *.cxx);;C/C++头文件 (*.h);;C++头文件 (*.hpp);;所有文件 (*.*)");
+	QString cpath = QFileDialog::getSaveFileName(editor, "qdevcpp - 另存为", "", "C源代码 (*.c);;C++源代码 (*.cpp);;C/C++头文件 (*.h);;C++头文件 (*.hpp);;所有文件 (*.*)");
 	if (cpath == "") {
 		return false;
 	}
@@ -202,7 +187,7 @@ bool EditorInfo::saveas()  {
 bool EditorInfo::save() {
 	QString cpath = path;
 	if (isUntitled()) {
-		cpath = QFileDialog::getSaveFileName(editor, "qdevcpp - 保存", "", "C源代码 (*.c);;C++源代码 (*.cpp *.cc *.cxx);;C/C++头文件 (*.h);;C++头文件 (*.hpp);;所有文件 (*.*)");
+		cpath = QFileDialog::getSaveFileName(editor, "qdevcpp - 保存", "", "C源代码 (*.c);;C++源代码 (*.cpp);;C/C++头文件 (*.h);;C++头文件 (*.hpp);;所有文件 (*.*)");
 		if (cpath == "") {
 			return false;
 		}
