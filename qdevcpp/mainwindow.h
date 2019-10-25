@@ -36,7 +36,9 @@ public slots:
 	void updateWindowTitle();
 
 protected:
-	virtual void closeEvent(QCloseEvent* e);
+	virtual void closeEvent(QCloseEvent* );
+	virtual void dragEnterEvent(QDragEnterEvent* );
+	virtual void dropEvent(QDropEvent* );
 
 private:
 	Ui::MainWindow *ui;

@@ -61,7 +61,7 @@ sudo apt install libqscintilla2-qt5-dev
 	* [x] Linux
 	* [ ] 关联文件图标
 * [x] 滚轮缩放
-* [ ] 拖拽文件
+* [x] 拖拽文件
 * [ ] 制作安装包
 	* [ ] 合并mingw-w64
 

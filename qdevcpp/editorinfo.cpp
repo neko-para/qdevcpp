@@ -9,7 +9,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "subprocess.h"
-#include <QDebug>
 
 void CoreEditor::wheelEvent(QWheelEvent* e) {
 	if (e->modifiers() == Qt::ControlModifier) {
@@ -23,6 +22,14 @@ void CoreEditor::wheelEvent(QWheelEvent* e) {
 	} else {
 		QsciScintilla::wheelEvent(e);
 	}
+}
+
+void CoreEditor::dragEnterEvent(QDragEnterEvent* e) {
+	::window->dragEnterEvent(e);
+}
+
+void CoreEditor::dropEvent(QDropEvent* e) {
+	::window->dropEvent(e);
 }
 
 void CoreEditor::focusInEvent(QFocusEvent* e) {

@@ -18,6 +18,8 @@ protected:
 	virtual void wheelEvent(QWheelEvent* );
 	virtual void focusInEvent(QFocusEvent* );
 	virtual void keyPressEvent(QKeyEvent* );
+	virtual void dragEnterEvent(QDragEnterEvent* );
+	virtual void dropEvent(QDropEvent* );
 public:
 	using QsciScintilla::QsciScintilla;
 };

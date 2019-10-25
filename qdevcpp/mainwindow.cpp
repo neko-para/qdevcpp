@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QRegularExpression>
+#include <QMimeData>
+#include <QDebug>
 #include "global.h"
 #include "aboutqdevcpp.h"
 #include "compileconfig.h"
@@ -582,4 +584,21 @@ void MainWindow::closeEvent(QCloseEvent* e) {
 	} else {
 		e->accept();
 	}
+}
+
+void MainWindow::dragEnterEvent(QDragEnterEvent* e) {
+	if (e->mimeData()->hasFormat("text/plain")) {
+		e->acceptProposedAction();
+		e->accept();
+	}
+}
+
+void MainWindow::dropEvent(QDropEvent* e) {
+	QList<QUrl> urls = e->mimeData()->urls();
+	QStringList paths;
+	for (auto u : urls) {
+		paths.push_back(u.toLocalFile());
+	}
+	open(paths);
+	e->accept();
 }
