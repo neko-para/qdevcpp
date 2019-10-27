@@ -1,4 +1,4 @@
-![](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp/qdevcpp.ico)
+![qdevpp icon](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp/qdevcpp.ico)
 
 # QDevCpp
 
@@ -57,20 +57,20 @@ sudo apt install libqscintilla2-qt5-dev
 ### v0.1
 
 * [ ] 文件关联
-	* [x] Windows
-	* [x] Linux
-	* [ ] 关联文件图标
+  * [x] Windows
+  * [x] Linux
+  * [ ] 关联文件图标
 * [x] 滚轮缩放
 * [x] 拖拽文件
 * [ ] 制作安装包
-	* [ ] 合并mingw-w64
+  * [ ] 合并mingw-w64
 
 ### v0.2
 
 * [ ] 括号折叠
 * [ ] 括号补全
 * [ ] 同一文件多窗口编辑
-	* [ ] 左右,上下分栏
+  * [ ] 左右,上下分栏
 
 ### v0.3
 
@@ -82,4 +82,4 @@ sudo apt install libqscintilla2-qt5-dev
 * [ ] 中文GCC错误信息支持?
 * [ ] 交互题
 * [ ] 适用于比赛的项目
-	* [ ] 执行文件输入输出重定向
+  * [ ] 执行文件输入输出重定向

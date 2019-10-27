@@ -1,4 +1,3 @@
 TEMPLATE = subdirs
 
-SUBDIRS = qdevcpp \
-    update
+SUBDIRS = qdevcpp
