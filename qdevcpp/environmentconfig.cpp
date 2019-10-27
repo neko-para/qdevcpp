@@ -77,6 +77,7 @@ bool LinkTool::install() {
 #elif defined(Q_OS_WIN32)
 	path = path.replace('/', '\\');
 	// TODO: ask UAC
+	int id = 1;
 	for (QString s : QStringList { "c", "cpp", "h", "hpp" }) {
 		QSettings reg(QString(R"(HKEY_CLASSES_ROOT\QDevCpp.%1)").arg(s), QSettings::NativeFormat);
 		if (!reg.isWritable()) {
@@ -84,6 +85,9 @@ bool LinkTool::install() {
 		}
 		reg.setValue("Default", name[s]);
 		reg.setValue("FriendlyAppName", "QDevCpp 编辑器");
+		reg.beginGroup("DefaultIcon");
+		reg.setValue("Default", QString("%1,%2").arg(path).arg(++id));
+		reg.endGroup();
 		reg.beginGroup("Shell");
 		reg.beginGroup("Open");
 		reg.beginGroup("Command");

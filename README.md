@@ -59,7 +59,7 @@ sudo apt install libqscintilla2-qt5-dev
 * [ ] 文件关联
   * [x] Windows
   * [x] Linux
-  * [ ] 关联文件图标
+  * [x] 关联文件图标
 * [x] 滚轮缩放
 * [x] 拖拽文件
 * [ ] 制作安装包
