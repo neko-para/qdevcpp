@@ -1,6 +1,6 @@
-![qdevpp icon](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp/qdevcpp.ico)
-
 # QDevCpp
+
+![qdevpp icon](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp/qdevcpp.ico)
 
 以OIer为用户群体的DevC++的升~~降~~级版。
 
@@ -33,13 +33,13 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 ##### Visual Studio
 
 ```shell
-vcpkg install qscintilla
+vcpkg install qscintilla:windows-x86
 ```
 
 ##### MSYS2
 
 ```shell
-pacman -S mingw-w64-x86_64-qscintilla
+pacman -S mingw-w64-i686-qscintilla
 ```
 
 #### Linux
@@ -56,14 +56,16 @@ sudo apt install libqscintilla2-qt5-dev
 
 ### v0.1
 
-* [ ] 文件关联
+* [x] 文件关联
   * [x] Windows
   * [x] Linux
   * [x] 关联文件图标
 * [x] 滚轮缩放
 * [x] 拖拽文件
 * [ ] 制作安装包
-  * [ ] 合并mingw-w64
+  * [ ] windows
+    * [ ] 合并mingw-w64
+  * [ ] linux
 
 ### v0.2
 

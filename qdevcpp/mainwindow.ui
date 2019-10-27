@@ -571,6 +571,9 @@
    </property>
   </action>
   <action name="actionToggleComment">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>设置注释</string>
    </property>
@@ -601,16 +604,22 @@
    </property>
   </action>
   <action name="actionMoveRowUp">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>上移选择行</string>
+    <string>上移行</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Up</string>
    </property>
   </action>
   <action name="actionMoveRowDown">
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
-    <string>下移选择行</string>
+    <string>下移行</string>
    </property>
    <property name="shortcut">
     <string>Ctrl+Shift+Down</string>

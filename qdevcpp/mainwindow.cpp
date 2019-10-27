@@ -204,7 +204,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		e->beginUndoAction();
 		e->setSelection(sl, 0, el, e->lineLength(el));
 		QString text = e->selectedText();
-		QRegularExpression nc(R"(\n([^/]|/[^/]))");
+		QRegularExpression nc(R"(\n(([^/]|/[^/])|$))");
 		bool atend = (el + 1 == e->lines());
 		if (!atend) {
 			text = text.left(text.length() - 1);
@@ -518,10 +518,13 @@ void MainWindow::updateTab(int idx) {
 						 ui->actionCut,
 						 ui->actionPaste,
 						 ui->actionSelectAll,
+						 ui->actionToggleComment,
 						 ui->actionCopyRow,
 						 ui->actionDelRow,
 						 ui->actionIndent,
 						 ui->actionUnindent,
+						 ui->actionMoveRowUp,
+						 ui->actionMoveRowDown,
 					 });
 		for (auto l : status) {
 			l->setVisible(false);
@@ -535,8 +538,11 @@ void MainWindow::updateTab(int idx) {
 						 ui->actionCloseAll,
 						 ui->actionPaste,
 						 ui->actionSelectAll,
+						 ui->actionToggleComment,
 						 ui->actionCopyRow,
 						 ui->actionDelRow,
+						 ui->actionMoveRowUp,
+						 ui->actionMoveRowDown,
 					 });
 		EditorInfo* ei = info[currentEditor()];
 		ei->updateUndoRedoState();

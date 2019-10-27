@@ -75,6 +75,7 @@ void EditorInfo::updateSelectionState() {
 	bool e = (sl != -1);
 	ui->actionCopy->setEnabled(e);
 	ui->actionCut->setEnabled(e);
+	e = e && (sl != el);
 	ui->actionIndent->setEnabled(e);
 	ui->actionUnindent->setEnabled(e);
 }
