@@ -2,7 +2,7 @@
 #define CONFIG_H
 
 #define QDEVCPP_VERSION_MAJOR 0
-#define QDEVCPP_VERSION_MINOR 0
+#define QDEVCPP_VERSION_MINOR 1
 
 #include <QJsonValue>
 
