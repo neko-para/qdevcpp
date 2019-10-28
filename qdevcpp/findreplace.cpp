@@ -107,12 +107,14 @@ void FindReplace::setEditorInfo(EditorInfo* i) {
 		ui->labelReplace->setEnabled(false);
 		ui->find->setEnabled(false);
 		ui->replace->setEnabled(false);
+		ui->replaceAll->setEnabled(false);
 		ui->options->setEnabled(false);
 	} else {
 		ui->labelFind->setEnabled(true);
 		ui->labelReplace->setEnabled(true);
 		ui->find->setEnabled(true);
 		ui->replace->setEnabled(true);
+		ui->replaceAll->setEnabled(true);
 		ui->options->setEnabled(true);
 	}
 }

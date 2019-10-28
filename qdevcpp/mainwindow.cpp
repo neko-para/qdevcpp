@@ -593,10 +593,8 @@ void MainWindow::closeEvent(QCloseEvent* e) {
 }
 
 void MainWindow::dragEnterEvent(QDragEnterEvent* e) {
-	if (e->mimeData()->hasFormat("text/plain")) {
-		e->acceptProposedAction();
-		e->accept();
-	}
+	e->acceptProposedAction();
+	e->accept();
 }
 
 void MainWindow::dropEvent(QDropEvent* e) {
