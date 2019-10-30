@@ -18,9 +18,7 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 
 #### Mingw
 
-[静态编译 64位](https://github.com/neko-para/qdevcpp/releases/download/v0.0/qdevcpp-mingw-x64-static-release.7z)
-
-[静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.0/qdevcpp-mingw-x86-static-release.7z)
+[v0.1 静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-mingw-x86-static.7z)
 
 ## Build
 
@@ -62,10 +60,6 @@ sudo apt install libqscintilla2-qt5-dev
   * [x] 关联文件图标
 * [x] 滚轮缩放
 * [x] 拖拽文件
-* [ ] 制作安装包
-  * [ ] windows
-    * [ ] 合并mingw-w64
-  * [ ] linux
 
 ### v0.2
 

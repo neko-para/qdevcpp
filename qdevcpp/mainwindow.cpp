@@ -8,7 +8,6 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <QMimeData>
-#include <QDebug>
 #include "global.h"
 #include "aboutqdevcpp.h"
 #include "compileconfig.h"

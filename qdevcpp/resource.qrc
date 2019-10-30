@@ -1,7 +1,7 @@
 <RCC>
     <qresource prefix="/">
-        <file>qdevcpp.svg</file>
         <file>qdevcpp.ico</file>
         <file>qdevcpp.desktop</file>
+        <file>qdevcpp.svg</file>
     </qresource>
 </RCC>
