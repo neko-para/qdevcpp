@@ -55,7 +55,7 @@ sudo apt install libqscintilla2-qt5-dev
 ### v0.2
 
 * [x] 括号折叠
-* [ ] 括号补全
+* [x] 括号补全
 * [ ] 同一文件多窗口编辑
   * [ ] 左右,上下分栏
 

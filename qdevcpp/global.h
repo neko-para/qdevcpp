@@ -13,9 +13,11 @@ const QString exeSuf = "";
 #endif
 
 class MainWindow;
+class EditorConfigure;
 
 const QStringList cSuf = {"c"};
 const QStringList cxxSuf = {"cpp", "cxx", "cc"};
 extern MainWindow* window;
+extern EditorConfigure editorConfig;
 
 #endif // GLOBAL_H

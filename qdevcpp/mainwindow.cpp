@@ -16,18 +16,19 @@
 #include "findreplace.h"
 #include "subprocess.h"
 
-static EditorConfigure editorConfig;
 static QList<CompileConfigure> compileConfig;
 static int currentConfigIdx = -1;
 static QClipboard* clipboard = nullptr;
 static FindReplaceConfig findConfig;
 
+EditorConfigure editorConfig;
 MainWindow* window;
 CompileConfigure* currentConfig;
 
 CoreEditor* createEditor() {
 	CoreEditor* editor = new CoreEditor(nullptr);
 	editor->setTabWidth(4);
+	editor->setBraceMatching(QsciScintilla::StrictBraceMatch);
 	editor->setMargins(2);
 	editor->setMarginWidth(1, "00");
 	editor->setMarginLineNumbers(1, true);

@@ -14,7 +14,7 @@ struct EditorConfigure : public Config {
 		WS_SHOW,
 		WS_SHOW_EXCEPT_INDENT
 	};
-	bool autoIndent = false;
+	bool autoIndent = true;
 	int showWhiteSpace = WS_HIDE;
 	bool enableRightMargin = false;
 	int marginWidth = 80;
@@ -24,6 +24,11 @@ struct EditorConfigure : public Config {
 	QColor currentColor; // "#FFCCFFFF
 	QString font; // "Consolas"
 	int fontSize = 20;
+	bool completeSBrace = false;
+	bool completeMBrace = false;
+	bool completeLBrace = false;
+	bool completeSQuote = false;
+	bool completeDQuote = false;
 
 	EditorConfigure() : currentColor(0xCC, 0xFF, 0xFF), font("Consolas") {}
 	virtual QJsonValue toJson() const;

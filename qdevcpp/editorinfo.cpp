@@ -10,6 +10,8 @@
 #include "ui_mainwindow.h"
 #include "subprocess.h"
 
+#include <QDebug>
+
 void CoreEditor::wheelEvent(QWheelEvent* e) {
 	if (e->modifiers() == Qt::ControlModifier) {
 		QPoint ns = e->angleDelta() / QWheelEvent::DefaultDeltasPerStep;
@@ -18,6 +20,7 @@ void CoreEditor::wheelEvent(QWheelEvent* e) {
 		} else {
 			zoomIn(2 * ns.ry());
 		}
+		info->updateUndoRedoState();
 		e->accept();
 	} else {
 		QsciScintilla::wheelEvent(e);
@@ -40,6 +43,63 @@ void CoreEditor::focusInEvent(QFocusEvent* e) {
 	QsciScintilla::focusInEvent(e);
 }
 
+
+#define COMPLETE_UN(brace, braces, opt) \
+	case Qt::brace: \
+		if (!editorConfig.opt) { \
+			break; \
+		} \
+		if (selectedText().length()) { \
+			replaceSelectedText(braces + selectedText() + braces); \
+			justCompleteBrace = 0; \
+		} else { \
+			int l, i; \
+			getCursorPosition(&l, &i); \
+			if (justCompleteBrace == Qt::brace) { \
+				setCursorPosition(l, i + 1); \
+				justCompleteBrace = 0; \
+			} else { \
+				insert(braces braces); \
+				setCursorPosition(l, i + 1); \
+				justCompleteBrace = Qt::brace; \
+			} \
+		} \
+		e->accept(); \
+		return;
+
+#define COMPLETE_BI(lbrace, rbrace, lbraces, rbraces, opt) \
+	case Qt::lbrace: \
+		if (!editorConfig.opt) { \
+			break; \
+		} \
+		if (selectedText().length()) { \
+			replaceSelectedText(lbraces + selectedText() + rbraces); \
+			justCompleteBrace = 0; \
+		} else { \
+			int l, i; \
+			getCursorPosition(&l, &i); \
+			insert(lbraces rbraces); \
+			setCursorPosition(l, i + 1); \
+			justCompleteBrace = Qt::lbrace; \
+		} \
+		e->accept(); \
+		return; \
+	case Qt::rbrace: \
+		if (!editorConfig.opt) { \
+			break; \
+		} \
+		if (justCompleteBrace == Qt::lbrace) { \
+			int l, i; \
+			getCursorPosition(&l, &i); \
+			setCursorPosition(l, i + 1); \
+			justCompleteBrace = 0; \
+			e->accept(); \
+			return; \
+		} \
+		justCompleteBrace = 0; \
+		break;
+
+
 void CoreEditor::keyPressEvent(QKeyEvent* e) {
 	if (e->modifiers() == Qt::ControlModifier) {
 		switch (e->key()) {
@@ -51,6 +111,27 @@ void CoreEditor::keyPressEvent(QKeyEvent* e) {
 			::window->ui->actionToggleComment->trigger();
 			e->accept();
 			return;
+		}
+	} else if (e->modifiers() == Qt::NoModifier || e->modifiers() == Qt::ShiftModifier) {
+		if (justCompleteBrace) {
+			if (e->key() == Qt::Key_Backspace) {
+				int l, i;
+				getCursorPosition(&l, &i);
+				setSelection(l, i - 1, l, i + 1);
+				removeSelectedText();
+				e->accept();
+				return;
+			}
+		}
+		switch (e->key()) {
+		COMPLETE_BI(Key_ParenLeft, Key_ParenRight, "(", ")", completeSBrace);
+		COMPLETE_BI(Key_BracketLeft, Key_BracketRight, "[", "]", completeMBrace);
+		COMPLETE_BI(Key_BraceLeft, Key_BraceRight, "{", "}", completeLBrace);
+		COMPLETE_UN(Key_QuoteDbl, "\"", completeDQuote);
+		COMPLETE_UN(Key_Apostrophe, "'", completeSQuote);
+		}
+		if (e->key()) {
+			justCompleteBrace = 0;
 		}
 	}
 	return QsciScintilla::keyPressEvent(e);
@@ -109,12 +190,13 @@ QsciLexerCPP* createLexer() {
 }
 
 EditorInfo::EditorInfo(CoreEditor *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
-	connect(e, &CoreEditor::modificationChanged, this, &EditorInfo::modificationChanged);
-	connect(e, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
-	connect(e, &CoreEditor::selectionChanged, this, &EditorInfo::updateSelectionState);
-	connect(e, &CoreEditor::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
-	connect(e, &CoreEditor::selectionChanged, this, &EditorInfo::updateStatusInfo);
-	connect(e, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
+	editor->info = this;
+	connect(editor, &CoreEditor::modificationChanged, this, &EditorInfo::modificationChanged);
+	connect(editor, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
+	connect(editor, &CoreEditor::selectionChanged, this, &EditorInfo::updateSelectionState);
+	connect(editor, &CoreEditor::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(editor, &CoreEditor::selectionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(editor, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
 	connect(this, &EditorInfo::pathChange, [&](QString) {
 		if (shallSyntaxHighlight()) {
 			if (!editor->lexer()) {

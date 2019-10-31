@@ -22,6 +22,8 @@ protected:
 	virtual void dropEvent(QDropEvent* );
 public:
 	using QsciScintilla::QsciScintilla;
+	class EditorInfo* info = nullptr;
+	int justCompleteBrace = 0;
 };
 
 //typedef QsciScintilla Editor;
