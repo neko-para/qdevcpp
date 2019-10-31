@@ -14,9 +14,7 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 
 ## Release
 
-### Windows
-
-#### Mingw
+### Mingw
 
 [v0.1 静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-mingw-x86-static.7z)
 
@@ -54,16 +52,9 @@ sudo apt install libqscintilla2-qt5-dev
 
 ### v0.1
 
-* [x] 文件关联
-  * [x] Windows
-  * [x] Linux
-  * [x] 关联文件图标
-* [x] 滚轮缩放
-* [x] 拖拽文件
-
 ### v0.2
 
-* [ ] 括号折叠
+* [x] 括号折叠
 * [ ] 括号补全
 * [ ] 同一文件多窗口编辑
   * [ ] 左右,上下分栏

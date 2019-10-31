@@ -67,6 +67,13 @@ void EditorInfo::modificationChanged(bool m) {
 void EditorInfo::updateUndoRedoState() {
 	ui->actionUndo->setEnabled(editor->isUndoAvailable());
 	ui->actionRedo->setEnabled(editor->isRedoAvailable());
+	int lines = editor->lines();
+	int w = 0;
+	while (lines) {
+		lines /= 10;
+		++w;
+	}
+	editor->setMarginWidth(1, QString(w + 1, '0'));
 }
 
 void EditorInfo::updateSelectionState() {
@@ -167,13 +174,6 @@ void EditorInfo::updateEditorConfig(const EditorConfigure& cfg) {
 		editor->setEdgeColumn(cfg.marginWidth);
 	} else {
 		editor->setEdgeMode(QsciScintilla::EdgeNone);
-	}
-	if (cfg.showLineNumber) {
-		editor->setMargins(2);
-		editor->setMarginWidth(1, "000000");
-		editor->setMarginLineNumbers(1, true);
-	} else {
-		editor->setMargins(1);
 	}
 	editor->setCaretLineVisible(cfg.highlightCurrent);
 	if (cfg.highlightCurrent) {

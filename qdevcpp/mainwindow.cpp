@@ -28,6 +28,10 @@ CompileConfigure* currentConfig;
 CoreEditor* createEditor() {
 	CoreEditor* editor = new CoreEditor(nullptr);
 	editor->setTabWidth(4);
+	editor->setMargins(2);
+	editor->setMarginWidth(1, "00");
+	editor->setMarginLineNumbers(1, true);
+	editor->setFolding(QsciScintilla::BoxedTreeFoldStyle, 0);
 	return editor;
 }
 

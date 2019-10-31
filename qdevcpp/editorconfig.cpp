@@ -13,7 +13,6 @@ QJsonValue EditorConfigure::toJson() const {
 	JSON_SET(marginWidth);
 	JSON_SET(enableAutoSave);
 	JSON_SET(saveInterval);
-	JSON_SET(showLineNumber);
 	JSON_SET(highlightCurrent);
 	obj.insert("currentColor", QJsonValue(currentColor.name(QColor::HexArgb)));
 	JSON_SET(font);
@@ -29,7 +28,6 @@ void EditorConfigure::fromJson(QJsonValue value) {
 	JSON_GET(marginWidth);
 	JSON_GET(enableAutoSave);
 	JSON_GET(saveInterval);
-	JSON_GET(showLineNumber);
 	JSON_GET(highlightCurrent);
 	if (obj.contains("currentColor")) {
 		currentColor.setNamedColor(obj["currentColor"].toVariant().value<QString>());
@@ -46,7 +44,6 @@ EditorConfig::EditorConfig(const EditorConfigure& cfg, QWidget *parent) : QDialo
 	BIND_CONFIG_INT(marginWidth, QSpinBox);
 	BIND_CONFIG_BOOL(enableAutoSave);
 	BIND_CONFIG_INT(saveInterval, QSlider);
-	BIND_CONFIG_BOOL(showLineNumber);
 	BIND_CONFIG_BOOL(highlightCurrent);
 	connect(ui->browseCurrentColor, &QToolButton::clicked, [&]() {
 		QColor c = QColorDialog::getColor(config.currentColor, this, "qdevcpp - 选取当前行颜色");

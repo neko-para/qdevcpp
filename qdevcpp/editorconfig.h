@@ -20,7 +20,6 @@ struct EditorConfigure : public Config {
 	int marginWidth = 80;
 	bool enableAutoSave = false;
 	int saveInterval = 5;
-	bool showLineNumber = true;
 	bool highlightCurrent = true;
 	QColor currentColor; // "#FFCCFFFF
 	QString font; // "Consolas"
