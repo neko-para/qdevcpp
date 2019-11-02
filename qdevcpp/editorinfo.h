@@ -1,6 +1,10 @@
 #ifndef EDITORINFO_H
 #define EDITORINFO_H
 
+#ifdef _MSC_VER
+#define QSCINTILLA_DLL
+#endif
+
 #include <QDateTime>
 #include <QLabel>
 #include <Qsci/qsciscintilla.h>

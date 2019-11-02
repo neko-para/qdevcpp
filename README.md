@@ -16,7 +16,13 @@ This is not a generic IDE. If you want to learn the c/c++ programing language, d
 
 ### Mingw
 
-[v0.1 静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-mingw-x86-static.7z)
+[v0.1 Mingw静态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-mingw-x86-static.7z)
+
+~~[v0.1 MSVC2019动态编译 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-msvc-x86-shared.7z)~~
+
+~~[v0.1 MSVC2019动态编译 仅程序 32位](https://github.com/neko-para/qdevcpp/releases/download/v0.1/qdevcpp-msvc-x86-shared-program-only.7z)~~
+
+> msvc版本将在v0.2时制作
 
 ## Build
 

@@ -13,7 +13,7 @@ const QString exeSuf = "";
 #endif
 
 class MainWindow;
-class EditorConfigure;
+struct EditorConfigure;
 
 const QStringList cSuf = {"c"};
 const QStringList cxxSuf = {"cpp", "cxx", "cc"};

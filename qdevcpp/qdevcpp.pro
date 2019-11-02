@@ -24,9 +24,8 @@ DEFINES += QT_DEPRECATED_WARNINGS
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-SOURCES += \
-        main.cpp \
-        mainwindow.cpp \
+SOURCES += main.cpp \
+    mainwindow.cpp \
     compileconfig.cpp \
     subprocess.cpp \
     editorinfo.cpp \
@@ -35,8 +34,7 @@ SOURCES += \
     editorconfig.cpp \
     environmentconfig.cpp
 
-HEADERS += \
-        mainwindow.h \
+HEADERS += mainwindow.h \
     compileconfig.h \
     global.h \
     subprocess.h \
@@ -48,20 +46,21 @@ HEADERS += \
     editorconfig.h \
     environmentconfig.h
 
-FORMS += \
-        mainwindow.ui \
+FORMS += mainwindow.ui \
     compileconfig.ui \
     aboutqdevcpp.ui \
     findreplace.ui \
     editorconfig.ui \
     environmentconfig.ui
 
-RESOURCES += \
-    resource.qrc
+RESOURCES += resource.qrc
 
-DISTFILES += \
-    qdevcpp.desktop
+linux:RESOURCES += desktop.qrc
 
 win32:RC_ICONS = qdevcpp.ico c.ico cpp.ico h.ico hpp.ico
+
+msvc:QMAKE_CXXFLAGS += /utf-8
+
+msvc: qscintilla2 { LIBS += qscintilla2.lib }
 
 QMAKE_TARGET_DESCRIPTION=QDevCpp
