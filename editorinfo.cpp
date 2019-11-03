@@ -3,14 +3,11 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QProcess>
-#include <Qsci/qscilexercpp.h>
 #include "global.h"
 #include "compileconfig.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include "subprocess.h"
-
-#include <QDebug>
 
 void CoreEditor::wheelEvent(QWheelEvent* e) {
 	if (e->modifiers() == Qt::ControlModifier) {
@@ -176,12 +173,6 @@ void EditorInfo::updateStatusInfo() {
 	} else {
 		window->status[MainWindow::ST_S]->setText("");
 	}
-}
-
-QsciLexerCPP* createLexer() {
-	QsciLexerCPP* lexer = new QsciLexerCPP;
-	lexer->setFont(QFont("ubuntu mono"));
-	return lexer;
 }
 
 EditorInfo::EditorInfo(CoreEditor *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
