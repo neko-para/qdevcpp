@@ -43,15 +43,16 @@ void CompileConfigure::fromJson(QJsonValue value) {
 	JSON_GET(debug);
 }
 
-void CompileConfigure::start(QProcess& proc, const QString& src, QString& compiler) {
+QString CompileConfigure::start(QProcess& proc, const QString& src, Language* language) {
 	QStringList arg;
 	QFileInfo si(src);
+	QString compiler;
 	arg << src << "-o" << (si.path() + QDir::separator() + si.baseName() + exeSuf);
 	arg << ("-O" + (QStringList{"0", "1", "2", "3", "fast", "g"}[optimize]));
-	if (cSuf.contains(si.suffix())) {
+	if (language->test<CLanguage>()) {
 		arg << ("-std=c" + (QStringList{"90", "99", "11"}[cstd]));
 		compiler = gccPath;
-	} else if (cxxSuf.contains(si.suffix())) {
+	} else if (language->test<CLanguage>()) {
 		arg << ("-std=c++" + (QStringList{"98", "11", "14", "17"}[cxxstd]));
 		compiler = gxxPath;
 	}
@@ -77,6 +78,7 @@ void CompileConfigure::start(QProcess& proc, const QString& src, QString& compil
 	}
 	arg << extraCompile.split(QRegularExpression(R"(\n)"), QString::SkipEmptyParts);
 	proc.start(compiler, arg, QIODevice::ReadOnly);
+	return compiler;
 }
 
 CompileConfig::CompileConfig(QList<CompileConfigure> cfg, int cur, QWidget *parent) : QDialog(parent), ui(new Ui::CompileConfig), config(cfg) {

@@ -20,19 +20,11 @@ void CoreEditor::wheelEvent(QWheelEvent* e) {
 		} else {
 			zoomIn(2 * ns.ry());
 		}
-		info->updateUndoRedoState();
+		info->updateLineNumber();
 		e->accept();
 	} else {
 		QsciScintilla::wheelEvent(e);
 	}
-}
-
-void CoreEditor::dragEnterEvent(QDragEnterEvent* e) {
-	::window->dragEnterEvent(e);
-}
-
-void CoreEditor::dropEvent(QDropEvent* e) {
-	::window->dropEvent(e);
 }
 
 void CoreEditor::focusInEvent(QFocusEvent* e) {
@@ -124,11 +116,11 @@ void CoreEditor::keyPressEvent(QKeyEvent* e) {
 			}
 		}
 		switch (e->key()) {
-		COMPLETE_BI(Key_ParenLeft, Key_ParenRight, "(", ")", completeSBrace);
-		COMPLETE_BI(Key_BracketLeft, Key_BracketRight, "[", "]", completeMBrace);
-		COMPLETE_BI(Key_BraceLeft, Key_BraceRight, "{", "}", completeLBrace);
-		COMPLETE_UN(Key_QuoteDbl, "\"", completeDQuote);
-		COMPLETE_UN(Key_Apostrophe, "'", completeSQuote);
+			COMPLETE_BI(Key_ParenLeft, Key_ParenRight, "(", ")", completeSBrace);
+			COMPLETE_BI(Key_BracketLeft, Key_BracketRight, "[", "]", completeMBrace);
+			COMPLETE_BI(Key_BraceLeft, Key_BraceRight, "{", "}", completeLBrace);
+			COMPLETE_UN(Key_QuoteDbl, "\"", completeDQuote);
+			COMPLETE_UN(Key_Apostrophe, "'", completeSQuote);
 		}
 		if (e->key()) {
 			justCompleteBrace = 0;
@@ -148,6 +140,9 @@ void EditorInfo::modificationChanged(bool m) {
 void EditorInfo::updateUndoRedoState() {
 	ui->actionUndo->setEnabled(editor->isUndoAvailable());
 	ui->actionRedo->setEnabled(editor->isRedoAvailable());
+}
+
+void EditorInfo::updateLineNumber() {
 	int lines = editor->lines();
 	int w = 0;
 	while (lines) {
@@ -191,25 +186,21 @@ QsciLexerCPP* createLexer() {
 
 EditorInfo::EditorInfo(CoreEditor *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
 	editor->info = this;
+	language = Language::query("demo.txt");
 	connect(editor, &CoreEditor::modificationChanged, this, &EditorInfo::modificationChanged);
 	connect(editor, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
+	connect(editor, &CoreEditor::textChanged, this, &EditorInfo::updateLineNumber);
 	connect(editor, &CoreEditor::selectionChanged, this, &EditorInfo::updateSelectionState);
-	connect(editor, &CoreEditor::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
 	connect(editor, &CoreEditor::selectionChanged, this, &EditorInfo::updateStatusInfo);
-	connect(editor, &CoreEditor::textChanged, this, &EditorInfo::updateUndoRedoState);
-	connect(this, &EditorInfo::pathChange, [&](QString) {
-		if (shallSyntaxHighlight()) {
-			if (!editor->lexer()) {
-				editor->setLexer(createLexer());
-			}
-		} else {
-			if (editor->lexer()) {
-				editor->lexer()->deleteLater();
-				editor->setLexer(0);
-			}
+	connect(editor, &CoreEditor::cursorPositionChanged, this, &EditorInfo::updateStatusInfo);
+	connect(this, &EditorInfo::pathChange, [&](QString cpath) {
+		if (editor->lexer()) {
+			editor->lexer()->deleteLater();
 		}
+		delete language;
+		language = Language::query(cpath);
+		editor->setLexer(language->lexer());
 	});
-
 	connect(this, &EditorInfo::pathChange, window, &MainWindow::updateWindowTitle);
 	generateUntitled();
 }
@@ -341,10 +332,6 @@ bool EditorInfo::askSave()  {
 	}
 }
 
-bool EditorInfo::shallSyntaxHighlight() const {
-	return isUntitled() ? true : QStringList({"c", "cpp", "cxx", "cc", "h", "hpp"}).contains(QFileInfo(path).suffix());
-}
-
 static QTableWidgetItem* generateItem(const QString& s, int align = Qt::AlignCenter) {
 	auto i = new QTableWidgetItem(s);
 	i->setTextAlignment(align);
@@ -352,10 +339,12 @@ static QTableWidgetItem* generateItem(const QString& s, int align = Qt::AlignCen
 }
 
 bool EditorInfo::compile() const {
+	if (!language->test<CompilableLanguage>()) {
+		return false;
+	}
 	QProcess proc;
 	proc.setEnvironment(QProcess::systemEnvironment() << "LANGUAGE=en_US.UTF-8");
-	QString cc;
-	currentConfig->start(proc, path, cc);
+	QString cc = currentConfig->start(proc, path, language);
 	ui->Log->appendPlainText(QString("[执行]%1").arg(cc));
 	proc.setReadChannel(QProcess::StandardError);
 	int retCode = -1;

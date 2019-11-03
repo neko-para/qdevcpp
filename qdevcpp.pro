@@ -32,7 +32,8 @@ SOURCES += main.cpp \
     aboutqdevcpp.cpp \
     findreplace.cpp \
     editorconfig.cpp \
-    environmentconfig.cpp
+    environmentconfig.cpp \
+    language.cpp
 
 HEADERS += mainwindow.h \
     compileconfig.h \
@@ -44,7 +45,8 @@ HEADERS += mainwindow.h \
     config.h \
     confighelp.h \
     editorconfig.h \
-    environmentconfig.h
+    environmentconfig.h \
+    language.h
 
 FORMS += mainwindow.ui \
     compileconfig.ui \
@@ -59,8 +61,8 @@ linux:RESOURCES += desktop.qrc
 
 win32:RC_ICONS = qdevcpp.ico c.ico cpp.ico h.ico hpp.ico
 
-msvc:QMAKE_CXXFLAGS += /utf-8
+msvc:QMAKE_CXXFLAGS += /utf-8 /D:QSCINTILLA_DLL
 
 msvc: qscintilla2 { LIBS += qscintilla2.lib }
 
-QMAKE_TARGET_DESCRIPTION=QDevCpp
+QMAKE_TARGET_DESCRIPTION = QDevCpp

@@ -15,8 +15,6 @@ const QString exeSuf = "";
 class MainWindow;
 struct EditorConfigure;
 
-const QStringList cSuf = {"c"};
-const QStringList cxxSuf = {"cpp", "cxx", "cc"};
 extern MainWindow* window;
 extern EditorConfigure editorConfig;
 

@@ -33,6 +33,7 @@ CoreEditor* createEditor() {
 	editor->setMarginWidth(1, "00");
 	editor->setMarginLineNumbers(1, true);
 	editor->setFolding(QsciScintilla::BoxedTreeFoldStyle, 0);
+	editor->setAcceptDrops(false);
 	return editor;
 }
 

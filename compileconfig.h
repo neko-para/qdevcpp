@@ -6,6 +6,7 @@
 #include <QProcess>
 #include <QJsonObject>
 #include "config.h"
+#include "language.h"
 
 namespace Ui {
 	class CompileConfig;
@@ -57,7 +58,7 @@ struct CompileConfigure : public Config {
 
 	virtual QJsonValue toJson() const;
 	virtual void fromJson(QJsonValue value);
-	void start(QProcess& proc, const QString& src, QString& compiler);
+	QString start(QProcess& proc, const QString& src, Language* language);
 };
 
 extern CompileConfigure* currentConfig;

@@ -1,15 +1,12 @@
 #ifndef EDITORINFO_H
 #define EDITORINFO_H
 
-#ifdef _MSC_VER
-#define QSCINTILLA_DLL
-#endif
-
 #include <QDateTime>
 #include <QLabel>
 #include <Qsci/qsciscintilla.h>
 #include <Qsci/qscilexer.h>
 #include "editorconfig.h"
+#include "language.h"
 
 namespace Ui {
 	class MainWindow;
@@ -22,8 +19,6 @@ protected:
 	virtual void wheelEvent(QWheelEvent* );
 	virtual void focusInEvent(QFocusEvent* );
 	virtual void keyPressEvent(QKeyEvent* );
-	virtual void dragEnterEvent(QDragEnterEvent* );
-	virtual void dropEvent(QDropEvent* );
 public:
 	using QsciScintilla::QsciScintilla;
 	class EditorInfo* info = nullptr;
@@ -39,6 +34,7 @@ class EditorInfo : public QObject {
 	friend class MainWindow;
 
 	CoreEditor* editor;
+	Language* language = nullptr;
 	Ui::MainWindow* ui;
 	QString path;
 	bool modified = false;
@@ -53,6 +49,7 @@ private slots:
 	void modificationChanged(bool m);
 public slots:
 	void updateUndoRedoState();
+	void updateLineNumber();
 	void updateSelectionState();
 	void updateStatusInfo();
 public:
@@ -79,7 +76,6 @@ public:
 	bool saveas();
 	bool save();
 	bool askSave();
-	bool shallSyntaxHighlight() const;
 	bool compile() const;
 	void run();
 	bool isModifiedByOthers() const;
