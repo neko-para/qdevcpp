@@ -106,8 +106,7 @@
     <property name="title">
      <string>视图</string>
     </property>
-    <addaction name="actionCompileInfoDock"/>
-    <addaction name="actionDebugToolDock"/>
+    <addaction name="actionInfoDock"/>
     <addaction name="actionStatusBar"/>
    </widget>
    <widget class="QMenu" name="menuRun">
@@ -144,13 +143,10 @@
    <addaction name="menuTool"/>
    <addaction name="menuAbout"/>
   </widget>
-  <widget class="QDockWidget" name="dockDebug">
-   <attribute name="dockWidgetArea">
-    <number>2</number>
-   </attribute>
-   <widget class="QWidget" name="dockWidgetContents"/>
-  </widget>
   <widget class="QDockWidget" name="dockInfo">
+   <property name="allowedAreas">
+    <set>Qt::BottomDockWidgetArea|Qt::TopDockWidgetArea</set>
+   </property>
    <attribute name="dockWidgetArea">
     <number>8</number>
    </attribute>
@@ -249,6 +245,88 @@
          </property>
          <item>
           <widget class="QPlainTextEdit" name="Log"/>
+         </item>
+        </layout>
+       </widget>
+       <widget class="QWidget" name="tab_3">
+        <attribute name="title">
+         <string>运行</string>
+        </attribute>
+        <layout class="QHBoxLayout" name="horizontalLayout_4">
+         <property name="leftMargin">
+          <number>0</number>
+         </property>
+         <property name="topMargin">
+          <number>0</number>
+         </property>
+         <property name="rightMargin">
+          <number>0</number>
+         </property>
+         <property name="bottomMargin">
+          <number>0</number>
+         </property>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_5">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>输入(stdin) </string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="stdin"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_7">
+           <item>
+            <widget class="QPushButton" name="run">
+             <property name="text">
+              <string>运行</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="stop">
+             <property name="enabled">
+              <bool>false</bool>
+             </property>
+             <property name="text">
+              <string>终止</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_8">
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>输出(stdout)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="stdout"/>
+           </item>
+          </layout>
+         </item>
+         <item>
+          <layout class="QVBoxLayout" name="verticalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>输出(stderr)</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPlainTextEdit" name="stderr"/>
+           </item>
+          </layout>
          </item>
         </layout>
        </widget>
@@ -456,7 +534,7 @@
     <string>停止执行</string>
    </property>
   </action>
-  <action name="actionCompileInfoDock">
+  <action name="actionInfoDock">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -464,7 +542,7 @@
     <bool>true</bool>
    </property>
    <property name="text">
-    <string>编译信息</string>
+    <string>信息</string>
    </property>
   </action>
   <action name="actionDebugToolDock">

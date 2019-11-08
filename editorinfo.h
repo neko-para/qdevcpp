@@ -70,7 +70,7 @@ public:
 	QString generateTitle() const {
 		return generateName() + (isAtSavePoint() ? "" : " *");
 	}
-	void updateEditorConfig(const EditorConfigure& cfg);
+	void updateEditorConfig();
 	bool open(const QString& cpath);
 	bool write(const QString& cpath);
 	bool saveas();

@@ -27,7 +27,6 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp \
     mainwindow.cpp \
     compileconfig.cpp \
-    subprocess.cpp \
     editorinfo.cpp \
     aboutqdevcpp.cpp \
     findreplace.cpp \
@@ -38,7 +37,6 @@ SOURCES += main.cpp \
 HEADERS += mainwindow.h \
     compileconfig.h \
     global.h \
-    subprocess.h \
     editorinfo.h \
     aboutqdevcpp.h \
     findreplace.h \

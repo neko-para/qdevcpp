@@ -14,7 +14,6 @@
 #include "editorconfig.h"
 #include "environmentconfig.h"
 #include "findreplace.h"
-#include "subprocess.h"
 
 static QList<CompileConfigure> compileConfig;
 static int currentConfigIdx = -1;
@@ -30,7 +29,6 @@ CoreEditor* createEditor() {
 	editor->setTabWidth(4);
 	editor->setBraceMatching(QsciScintilla::StrictBraceMatch);
 	editor->setMargins(2);
-	editor->setMarginWidth(1, "00");
 	editor->setMarginLineNumbers(1, true);
 	editor->setFolding(QsciScintilla::BoxedTreeFoldStyle, 0);
 	editor->setAcceptDrops(false);
@@ -114,7 +112,6 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		}
 	});
 	// Disable Debug
-	ui->dockDebug->setVisible(false);
 	ui->actionDebug->setEnabled(false);
 	ui->actionDebugToolDock->setEnabled(false);
 	ui->compileResult->horizontalHeader()->setStretchLastSection(true);
@@ -137,7 +134,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		CoreEditor* e = createEditor();
 		auto& ei = info[e];
 		ei = new EditorInfo(e, ui);
-		ei->updateEditorConfig(editorConfig);
+		ei->updateEditorConfig();
 		ui->SrcTab->addTab(e, ei->generateTitle());
 		ui->SrcTab->setCurrentWidget(e);
 		e->setFocus();
@@ -358,10 +355,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 	connect(ui->actionFindReplace, &QAction::triggered, [&]() {
 		finddlg->show();
 	});
-	connect(ui->dockInfo, &QDockWidget::visibilityChanged, ui->actionCompileInfoDock, &QAction::setChecked);
-	connect(ui->actionCompileInfoDock, &QAction::toggled, ui->dockInfo, &QDockWidget::setVisible);
-	connect(ui->dockDebug, &QDockWidget::visibilityChanged, ui->actionDebugToolDock, &QAction::setChecked);
-	connect(ui->actionDebugToolDock, &QAction::toggled, ui->dockDebug, &QDockWidget::setVisible);
+	connect(ui->dockInfo, &QDockWidget::visibilityChanged, ui->actionInfoDock, &QAction::setChecked);
+	connect(ui->actionInfoDock, &QAction::toggled, ui->dockInfo, &QDockWidget::setVisible);
 	connect(ui->actionStatusBar, &QAction::toggled, ui->statusBar, &QStatusBar::setVisible);
 	connect(ui->actionCompile, &QAction::triggered, [&]() {
 		auto ei = info[currentEditor()];
@@ -407,7 +402,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 		if (QDialog::Accepted == dlg.exec()) {
 			editorConfig = dlg.configure();
 			for (auto ei : info.values()) {
-				ei->updateEditorConfig(editorConfig);
+				ei->updateEditorConfig();
 			}
 			if (editorConfig.enableAutoSave) {
 				autoSave->start(editorConfig.saveInterval * 60 * 1000);
@@ -443,6 +438,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), ui(new Ui::MainWi
 			}
 		}
 	});
+	connect(ui->run, &QPushButton::clicked, ui->actionRun, &QAction::trigger);
 }
 
 MainWindow::~MainWindow() {
@@ -493,7 +489,7 @@ void MainWindow::open(const QStringList& paths) {
 			auto& ei = info[e];
 			ei = new EditorInfo(e, ui);
 			if (ei->open(p)) {
-				ei->updateEditorConfig(editorConfig);
+				ei->updateEditorConfig();
 				ui->SrcTab->addTab(e, ei->generateTitle());
 				ui->SrcTab->setCurrentWidget(e);
 				e->setFocus();
@@ -566,7 +562,8 @@ void MainWindow::updateTab(int idx) {
 
 void MainWindow::updateCompileActions() {
 	bool enabled = currentEditor();
-	ui->actionRun->setEnabled(enabled);
+	ui->actionRun->setEnabled(enabled && !processRunning);
+	ui->run->setEnabled(enabled && !processRunning);
 //	ui->actionClean->setEnabled(enabled);
 	enabled = enabled && (currentConfigIdx != -1);
 	ui->actionCompile->setEnabled(enabled);

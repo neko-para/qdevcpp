@@ -7,7 +7,8 @@
 #include "compileconfig.h"
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "subprocess.h"
+
+bool processRunning;
 
 void CoreEditor::wheelEvent(QWheelEvent* e) {
 	if (e->modifiers() == Qt::ControlModifier) {
@@ -142,10 +143,10 @@ void EditorInfo::updateUndoRedoState() {
 void EditorInfo::updateLineNumber() {
 	int lines = editor->lines();
 	int w = 0;
-	while (lines) {
+	do {
 		lines /= 10;
 		++w;
-	}
+	} while (lines);
 	editor->setMarginWidth(1, QString(w + 1, '0'));
 }
 
@@ -191,6 +192,7 @@ EditorInfo::EditorInfo(CoreEditor *e, Ui::MainWindow* ui) : editor(e), ui(ui) {
 		delete language;
 		language = Language::query(cpath);
 		editor->setLexer(language->lexer());
+		updateEditorConfig();
 	});
 	connect(this, &EditorInfo::pathChange, window, &MainWindow::updateWindowTitle);
 	generateUntitled();
@@ -230,25 +232,26 @@ QString EditorInfo::generateName() const {
 	}
 }
 
-void EditorInfo::updateEditorConfig(const EditorConfigure& cfg) {
-	editor->setAutoIndent(cfg.autoIndent);
-	editor->setWhitespaceVisibility((QsciScintilla::WhitespaceVisibility)cfg.showWhiteSpace);
-	if (cfg.enableRightMargin) {
+void EditorInfo::updateEditorConfig() {
+	editor->setAutoIndent(editorConfig.autoIndent);
+	editor->setWhitespaceVisibility((QsciScintilla::WhitespaceVisibility)editorConfig.showWhiteSpace);
+	if (editorConfig.enableRightMargin) {
 		editor->setEdgeMode(QsciScintilla::EdgeLine);
-		editor->setEdgeColumn(cfg.marginWidth);
+		editor->setEdgeColumn(editorConfig.marginWidth);
 	} else {
 		editor->setEdgeMode(QsciScintilla::EdgeNone);
 	}
-	editor->setCaretLineVisible(cfg.highlightCurrent);
-	if (cfg.highlightCurrent) {
-		editor->setCaretLineBackgroundColor(cfg.currentColor);
+	editor->setCaretLineVisible(editorConfig.highlightCurrent);
+	if (editorConfig.highlightCurrent) {
+		editor->setCaretLineBackgroundColor(editorConfig.currentColor);
 	}
-	QFont font(cfg.font, cfg.fontSize);
+	QFont font(editorConfig.font, editorConfig.fontSize);
 	if (editor->lexer()) {
 		editor->lexer()->setFont(font);
 	} else {
 		editor->setFont(font);
 	}
+	updateLineNumber();
 }
 
 bool EditorInfo::open(const QString& cpath)  {
@@ -391,8 +394,35 @@ void EditorInfo::run() {
 	if (!QFileInfo(exe).exists()) {
 		QMessageBox::warning(editor, "qdevcpp", "代码尚未编译");
 	} else {
-		SubProcess* sp = new SubProcess(ui->Log, exe, editor);
-		sp->start();
+		ui->Log->appendPlainText(QString("[执行]%1").arg(exe));
+		QProcess proc;
+		QEventLoop loop;
+		proc.start(exe, QStringList());
+		ui->stop->setEnabled(true);
+		processRunning = true;
+		::window->updateCompileActions();
+		connect(ui->stop, &QPushButton::clicked, &proc, &QProcess::kill);
+		connect(&proc, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), &loop, &QEventLoop::quit);
+		connect(&proc, &QProcess::errorOccurred, [&](QProcess::ProcessError ) {
+			ui->Log->appendPlainText(QString("[错误]%1").arg(proc.errorString()));
+			loop.exit(-1);
+		});
+		ui->stdout->clear();
+		ui->stderr->clear();
+		connect(&proc, &QProcess::readyReadStandardOutput, [&]() {
+			ui->stdout->appendPlainText(proc.readAllStandardOutput());
+		});
+		connect(&proc, &QProcess::readyReadStandardError, [&]() {
+			ui->stderr->appendPlainText(proc.readAllStandardError());
+		});
+		QByteArray input = ui->stdin->toPlainText().toUtf8();
+		proc.write(input);
+		proc.closeWriteChannel();
+		loop.exec();
+		ui->stop->setEnabled(false);
+		processRunning = false;
+		::window->updateCompileActions();
+		ui->Log->appendPlainText(QString("[返回]%1").arg(proc.exitCode()));
 	}
 }
 

@@ -17,5 +17,6 @@ struct EditorConfigure;
 
 extern MainWindow* window;
 extern EditorConfigure editorConfig;
+extern bool processRunning;
 
 #endif // GLOBAL_H

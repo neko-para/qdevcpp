@@ -52,7 +52,7 @@ QString CompileConfigure::start(QProcess& proc, const QString& src, Language* la
 	if (language->test<CLanguage>()) {
 		arg << ("-std=c" + (QStringList{"90", "99", "11"}[cstd]));
 		compiler = gccPath;
-	} else if (language->test<CLanguage>()) {
+	} else if (language->test<CxxLanguage>()) {
 		arg << ("-std=c++" + (QStringList{"98", "11", "14", "17"}[cxxstd]));
 		compiler = gxxPath;
 	}
