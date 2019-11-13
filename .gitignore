@@ -1,2 +1,3 @@
-*.pro.user
 .vscode
+CMakeLists.txt.user
+build*

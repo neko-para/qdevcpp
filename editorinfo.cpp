@@ -119,12 +119,27 @@ void CoreEditor::keyPressEvent(QKeyEvent* e) {
 			COMPLETE_BI(Key_BraceLeft, Key_BraceRight, "{", "}", completeLBrace);
 			COMPLETE_UN(Key_QuoteDbl, "\"", completeDQuote);
 			COMPLETE_UN(Key_Apostrophe, "'", completeSQuote);
+			case Qt::Key_Return:
+				if (justCompleteBrace == Qt::Key_BraceLeft) {
+					beginUndoAction();
+					QsciScintilla::keyPressEvent(e);
+					int l, i;
+					getCursorPosition(&l, &i);
+					setSelection(l, 0, l, i);
+					QString ins = "\n" + selectedText().mid(1);
+					selectAll(false);
+					setCursorPosition(l, i);
+					insert(ins);
+					setCursorPosition(l, i);
+					endUndoAction();
+					return;
+				}
 		}
 		if (e->key()) {
 			justCompleteBrace = 0;
 		}
 	}
-	return QsciScintilla::keyPressEvent(e);
+	QsciScintilla::keyPressEvent(e);
 }
 
 int EditorInfo::untitled_next;
@@ -407,15 +422,15 @@ void EditorInfo::run() {
 			ui->Log->appendPlainText(QString("[错误]%1").arg(proc.errorString()));
 			loop.exit(-1);
 		});
-		ui->stdout->clear();
-		ui->stderr->clear();
+		ui->stdoutEdit->clear();
+		ui->stderrEdit->clear();
 		connect(&proc, &QProcess::readyReadStandardOutput, [&]() {
-			ui->stdout->appendPlainText(proc.readAllStandardOutput());
+			ui->stdoutEdit->appendPlainText(proc.readAllStandardOutput());
 		});
 		connect(&proc, &QProcess::readyReadStandardError, [&]() {
-			ui->stderr->appendPlainText(proc.readAllStandardError());
+			ui->stderrEdit->appendPlainText(proc.readAllStandardError());
 		});
-		QByteArray input = ui->stdin->toPlainText().toUtf8();
+		QByteArray input = ui->stdinEdit->toPlainText().toUtf8();
 		proc.write(input);
 		proc.closeWriteChannel();
 		loop.exec();

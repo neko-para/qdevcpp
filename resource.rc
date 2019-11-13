@@ -1,0 +1,5 @@
+IDI_ICONCORE ICON "qdevcpp.ico"
+IDI_ICONC ICON "c.ico"
+IDI_ICONCPP ICON "cpp.ico"
+IDI_ICONH ICON "h.ico"
+IDI_ICONHPP ICON "hpp.ico"
