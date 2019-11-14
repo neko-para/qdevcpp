@@ -1,4 +1,7 @@
 .vscode
+.vs
+out
 CMakeLists.txt.user
+CMakeSettings.json
 build*
 resource.aps
