@@ -1,3 +1,7 @@
+# This repository is not maintained any more
+
+# Please try [CP Editor](https://github.com/cpeditor/cpeditor)
+
 # QDevCpp
 
 ![qdevpp icon](https://raw.githubusercontent.com/neko-para/qdevcpp/master/qdevcpp.ico)
